@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Servitium â Financial Model</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --red:#880808;--gold:#FAB515;--dark:#111;--card:#1c1c1e;--card2:#252528;
+  --border:rgba(255,255,255,.08);--text:#f2f2f7;--muted:#8e8e93;
+  --solo:#E8A838;--re:#4A9EBF;--ins:#7FC47A;--au:#B07FDD;--wm:#5BC4C0;
+  --green:#34C759;--danger:#FF3B30;--gold2:#FFD60A;
+  --topbar-h:56px;
+}
+@keyframes flash{0%{opacity:.5}100%{opacity:1}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--dark);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overscroll-behavior:none}
+body{padding-bottom:80px}
+
+/* ââ TOP BAR ââ */
+.topbar{background:rgba(17,17,17,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.tb-logo{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text)}
+.tb-tag{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.08em}
+.tb-badge{background:var(--red);color:#fff;font-size:10px;font-family:'DM Mono',monospace;padding:3px 8px;border-radius:4px;letter-spacing:.06em}
+
+/* ââ BOTTOM NAV ââ */
+.botnav{position:fixed;bottom:0;left:0;right:0;background:rgba(17,17,17,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);z-index:200;padding-bottom:env(safe-area-inset-bottom)}
+.bn{display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;cursor:pointer;transition:.15s;border:none;background:none;color:var(--muted);width:100%}
+.bn.active{color:var(--gold)}
+.bn-icon{font-size:22px;margin-bottom:2px;line-height:1}
+.bn-lbl{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.05em;text-transform:uppercase}
+
+/* ââ PAGE SYSTEM ââ */
+.page{display:none;padding:0 0 20px}
+.page.active{display:block}
+
+/* ââ SUMMARY BAR (top of each page) ââ */
+.sumbar{background:var(--red);padding:14px 16px;display:grid;gap:10px;position:sticky;top:var(--topbar-h);z-index:150;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.sumbar-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sbi{text-align:center}
+.sbi-val{font-family:'DM Mono',monospace;font-size:17px;font-weight:500;color:#fff}
+.sbi-lbl{font-size:9px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
+.sbi.accent .sbi-val{color:var(--gold2)}
+
+/* ââ SECTION CARDS ââ */
+.sec{margin:12px 12px 0;background:var(--card);border-radius:14px;overflow:hidden}
+.sec-head{padding:14px 16px 10px;border-bottom:1px solid var(--border)}
+.sec-eyebrow{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.sec-title{font-family:'DM Serif Display',serif;font-size:20px;line-height:1.1;margin-bottom:4px}
+.sec-sub{font-size:12px;color:var(--muted);line-height:1.55}
+.sec-body{padding:14px 16px}
+
+/* ââ METRIC CHIPS ââ */
+.chips{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+.chips.three{grid-template-columns:repeat(3,1fr)}
+.chip{background:var(--card2);border-radius:10px;padding:10px 12px}
+.chip-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.chip-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:500}
+.chip-sub{font-size:10px;color:var(--muted);margin-top:1px}
+
+/* ââ SLIDERS ââ */
+.sliders{background:var(--card2);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.sl-head{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.sl-head.gold{color:rgba(250,181,21,.7);border-bottom-color:rgba(250,181,21,.15)}
+.sl-head.tier1{color:rgba(250,181,21,.9)}
+.sl-row{margin-bottom:12px}
+.sl-row:last-child{margin-bottom:0}
+.sl-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.sl-label{font-size:13px;color:var(--muted)}
+.sl-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--text)}
+input[type=range]{
+  width:100%;-webkit-appearance:none;appearance:none;
+  height:4px;border-radius:2px;background:rgba(255,255,255,.12);
+  outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+  cursor:pointer;border:none;box-shadow:0 2px 6px rgba(0,0,0,.4);
+  background:#fff;
+}
+input[type=range]::-moz-range-thumb{
+  width:22px;height:22px;border-radius:50%;
+  cursor:pointer;border:none;box-shadow:0 2px 6px rgba(0,0,0,.4);
+  background:#fff;
+}
+input[type=range].gold-r::-webkit-slider-thumb{background:var(--gold)}
+input[type=range].gold-r::-moz-range-thumb{background:var(--gold)}
+input[type=range].gold-r{background:rgba(250,181,21,.2)}
+input[type=range].sl-solo::-webkit-slider-thumb{background:var(--solo)}
+input[type=range].sl-solo::-moz-range-thumb{background:var(--solo)}
+input[type=range].sl-re::-webkit-slider-thumb{background:var(--re)}
+input[type=range].sl-re::-moz-range-thumb{background:var(--re)}
+input[type=range].sl-ins::-webkit-slider-thumb{background:var(--ins)}
+input[type=range].sl-ins::-moz-range-thumb{background:var(--ins)}
+input[type=range].sl-au::-webkit-slider-thumb{background:var(--au)}
+input[type=range].sl-au::-moz-range-thumb{background:var(--au)}
+input[type=range].sl-wm::-webkit-slider-thumb{background:var(--wm)}
+input[type=range].sl-wm::-moz-range-thumb{background:var(--wm)}
+
+/* ââ CHART WRAPPER ââ */
+.cw{position:relative;width:100%;border-radius:10px;overflow:hidden;background:var(--card2)}
+.cw canvas{display:block}
+
+/* ââ LEGEND ââ */
+.leg{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px}
+.leg span{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.leg b{width:10px;height:10px;border-radius:2px;display:inline-block;flex-shrink:0}
+
+/* ââ NOTE BOX ââ */
+.notebox{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.7;margin-top:12px}
+.notebox strong{color:var(--text)}
+
+/* ââ P&L TABLE ââ */
+.pnl-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.pnl-tbl td{padding:7px 0;border-bottom:1px solid var(--border)}
+.pnl-tbl tr:last-child td{border-bottom:none}
+.pnl-tbl .lbl{color:var(--muted)}
+.pnl-tbl .val{text-align:right;font-family:'DM Mono',monospace;font-weight:500}
+.pnl-tbl .hdr td{color:var(--text);font-weight:500}
+.pnl-tbl .sep td{padding:3px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+
+/* ââ PROFIT CARDS ââ */
+.profit-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.pb{border-radius:10px;padding:12px;text-align:center}
+.pb-val{font-family:'DM Mono',monospace;font-size:17px;font-weight:500}
+.pb-lbl{font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+.pb.loss{background:rgba(255,59,48,.1);border:1px solid rgba(255,59,48,.25)}
+.pb.loss .pb-val{color:var(--danger)}
+.pb.neutral{background:rgba(255,255,255,.05);border:1px solid var(--border)}
+.pb.neutral .pb-val{color:var(--gold)}
+.pb.win{background:rgba(52,199,89,.1);border:1px solid rgba(52,199,89,.25)}
+.pb.win .pb-val{color:var(--green)}
+
+/* ââ ELAST BOX ââ */
+.elast-info{background:rgba(250,181,21,.06);border:1px solid rgba(250,181,21,.15);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.elast-info p{font-size:13px;color:var(--muted);line-height:1.65}
+.elast-info strong{color:var(--gold)}
+.elast-chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.ec{background:var(--card);border-radius:8px;padding:10px;text-align:center}
+.ec-val{font-family:'DM Mono',monospace;font-size:15px;font-weight:500}
+.ec-lbl{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* ââ DIVIDER ââ */
+.divider{height:1px;background:var(--border);margin:12px 0}
+
+/* ââ VERTICAL TAG DOTS ââ */
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+
+/* ELI12 EXPLANATION BOXES */
+.eli{background:rgba(250,181,21,.06);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:12px;font-size:13px;color:var(--muted);line-height:1.65}
+.eli strong{color:var(--gold)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <div class="tb-logo">Servitium</div>
+    <div class="tb-tag">Financial Model Â· 2026â2029</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <button onclick="resetAll()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--muted);font-size:10px;font-family:'DM Mono',monospace;padding:4px 10px;border-radius:4px;cursor:pointer;letter-spacing:.06em;transition:.15s" onmouseover="this.style.background='rgba(255,255,255,.15)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.08)';this.style.color='var(--muted)'">âº RESET</button>
+    <div class="tb-badge">NVBC 2026</div>
+  </div>
+</div>
+
+<!-- ââââââââââââââââââââââââââââââââââââââââ
+     PAGE 1 â REVENUE
+ââââââââââââââââââââââââââââââââââââââââ -->
+<div class="page active" id="page-revenue">
+
+  <!-- Summary bar -->
+  <div class="sumbar">
+    <div class="sumbar-row">
+      <div class="sbi"><div class="sbi-val" id="r-y1">â</div><div class="sbi-lbl">Year 1 revenue</div></div>
+      <div class="sbi"><div class="sbi-val" id="r-y2">â</div><div class="sbi-lbl">Year 2 revenue</div></div>
+      <div class="sbi"><div class="sbi-val" id="r-y3">â</div><div class="sbi-lbl">Year 3 revenue</div></div>
+    </div>
+    <div class="sbi accent" style="text-align:center">
+      <div class="sbi-val" id="r-cum">â</div>
+      <div class="sbi-lbl">3-year cumulative Â· all streams</div>
+    </div>
+  </div>
+
+  <!-- ELI12 -->
+  <div class="sec" style="margin-top:12px">
+    <div class="sec-body">
+      <div class="eli">
+        <strong>How this model works:</strong> Revenue is driven by a real go-to-market machine â student field teams visit businesses, a BD hire closes brokerages, churn is modelled, and transaction fees activate as the consumer side grows. Change any input and the whole model recalculates. Think of it like a sales funnel with real numbers.
+      </div>
+
+      <!-- GTM ENGINE INPUTS -->
+      <div class="sec-eyebrow" style="color:var(--gold)">
+        <span class="dot" style="background:var(--gold)"></span>Go-to-market engine
+      </div>
+      <div class="sec-sub" style="margin-bottom:12px">Student field teams visit local businesses, film content, onboard them to the platform. A BD hire manages students and closes brokerage LOIs. These inputs drive everything below.</div>
+
+      <div class="sliders">
+        <div class="sl-head gold">Field team size</div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Students (Y1 Â· $22/hr, 20 visits/wk each)</span><span class="sl-val" id="l-stu1">10</span></div><input type="range" id="stu1" min="2" max="30" step="1" value="10" class="gold-r"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Students (Y2)</span><span class="sl-val" id="l-stu2">20</span></div><input type="range" id="stu2" min="5" max="60" step="1" value="20" class="gold-r"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Students (Y3 â multiple cities)</span><span class="sl-val" id="l-stu3">50</span></div><input type="range" id="stu3" min="10" max="120" step="2" value="50" class="gold-r"></div>
+      </div>
+
+      <div class="sliders" style="margin-top:8px">
+        <div class="sl-head">Conversion &amp; churn</div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">BD-accompanied conversion % (M1â2)</span><span class="sl-val" id="l-conv-bd">10%</span></div><input type="range" id="conv-bd" min="5" max="25" step="1" value="10" class="sl-solo"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Student-only conversion % (M3+)</span><span class="sl-val" id="l-conv">8%</span></div><input type="range" id="conv" min="2" max="20" step="1" value="8" class="sl-solo"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Monthly churn Y1</span><span class="sl-val" id="l-ch1">15%</span></div><input type="range" id="ch1" min="3" max="30" step="1" value="15" class="sl-solo"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Monthly churn Y2</span><span class="sl-val" id="l-ch2">7%</span></div><input type="range" id="ch2" min="2" max="20" step="1" value="7" class="sl-solo"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Monthly churn Y3</span><span class="sl-val" id="l-ch3">4%</span></div><input type="range" id="ch3" min="1" max="15" step="1" value="4" class="sl-solo"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- STREAM 1: SOLO BUSINESSES -->
+      <div class="sec-eyebrow" style="color:var(--solo)">
+        <span class="dot" style="background:var(--solo)"></span>Stream 1 â Solo businesses (all industries)
+      </div>
+      <div class="sec-sub" style="margin-bottom:12px">Any solo business owner, 0â4 employees, any industry. $25/month subscription (first month free). Platform earns <strong style="color:var(--text)">7%</strong> on completed transactions â transaction fee activates as consumer side grows. TAM: ~200,000 solo businesses in Metro Vancouver.</div>
+
+      <div class="chips">
+        <div class="chip"><div class="chip-lbl">Year 1 total</div><div class="chip-val" style="color:var(--solo)" id="s1-y1">â</div><div class="chip-sub">CAD</div></div>
+        <div class="chip"><div class="chip-lbl">Year 2 total</div><div class="chip-val" style="color:var(--solo)" id="s1-y2">â</div></div>
+        <div class="chip"><div class="chip-lbl">Year 3 total</div><div class="chip-val" style="color:var(--solo)" id="s1-y3">â</div></div>
+        <div class="chip"><div class="chip-lbl">Paying at Y1 end</div><div class="chip-val" style="color:var(--solo)" id="s1-cnt">â</div><div class="chip-sub">businesses</div></div>
+      </div>
+
+      <div class="sliders">
+        <div class="sl-head">Transaction economics</div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Avg transaction value (CAD)</span><span class="sl-val" id="l-jv">$200</span></div><input type="range" id="jv" min="50" max="500" step="10" value="200" class="sl-solo"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Jobs per active business per month</span><span class="sl-val" id="l-jm">4</span></div><input type="range" id="jm" min="1" max="20" step="1" value="4" class="sl-solo"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">% businesses transacting (Y1 end)</span><span class="sl-val" id="l-txna">55%</span></div><input type="range" id="txna" min="10" max="90" step="5" value="55" class="sl-solo"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">% businesses transacting (Y2 end)</span><span class="sl-val" id="l-txnb">68%</span></div><input type="range" id="txnb" min="20" max="95" step="5" value="68" class="sl-solo"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">% businesses transacting (Y3 end)</span><span class="sl-val" id="l-txnc">75%</span></div><input type="range" id="txnc" min="30" max="99" step="5" value="75" class="sl-solo"></div>
+      </div>
+
+      <div class="cw" style="height:180px;padding:12px"><canvas id="c-s1"></canvas></div>
+      <div class="leg">
+        <span><b style="background:var(--solo);opacity:.5"></b>Subscription ($25/mo)</span>
+        <span><b style="background:var(--solo)"></b>Transaction (7% of job value)</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- STREAM 2: REAL ESTATE -->
+      <div class="sec-eyebrow" style="color:var(--re);margin-top:4px">
+        <span class="dot" style="background:var(--re)"></span>Stream 2 â Real estate agents Â· $199/mo per seat
+      </div>
+      <div class="sec-sub" style="margin-bottom:12px">23,000 licensed REALTORSÂ® in Metro Vancouver. BD hire closes brokerage LOIs â each brokerage brings multiple agent seats. Agents currently spend <strong style="color:var(--text)">$1,691/month</strong> on fragmented tools â Servitium at $199/month = 12% of that. Launches Month 7 (Oct 2026). <strong style="color:var(--text)">Default targets: 0.13% of SAM by Y1 â 0.53% by Y2 â 2.4% by Y3.</strong></div>
+      <div class="chips three">
+        <div class="chip"><div class="chip-lbl">Year 1 (6mo)</div><div class="chip-val" style="color:var(--re)" id="s2-y1">â</div></div>
+        <div class="chip"><div class="chip-lbl">Year 2</div><div class="chip-val" style="color:var(--re)" id="s2-y2">â</div></div>
+        <div class="chip"><div class="chip-lbl">Year 3</div><div class="chip-val" style="color:var(--re)" id="s2-y3">â</div></div>
+      </div>
+      <div class="sliders">
+        <div class="sl-head">Brokerage pipeline (RE)</div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Brokerages signed by Y1 end</span><span class="sl-val" id="l-reb1">1</span></div><input type="range" id="reb1" min="0" max="10" step="1" value="1" class="sl-re"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Brokerages signed by Y2 end</span><span class="sl-val" id="l-reb2">6</span></div><input type="range" id="reb2" min="1" max="30" step="1" value="6" class="sl-re"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Brokerages signed by Y3 end</span><span class="sl-val" id="l-reb3">18</span></div><input type="range" id="reb3" min="2" max="60" step="1" value="18" class="sl-re"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Avg agent seats per brokerage</span><span class="sl-val" id="l-reaps">20</span></div><input type="range" id="reaps" min="5" max="50" step="1" value="20" class="sl-re"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- STREAM 3: INSURANCE -->
+      <div class="sec-eyebrow" style="color:var(--ins);margin-top:4px">
+        <span class="dot" style="background:var(--ins)"></span>Stream 3 â Insurance brokers Â· $199/mo per seat
+      </div>
+      <div class="sec-sub" style="margin-bottom:12px">BC has <strong style="color:var(--text)">870+ brokerages, 8,400+ licensed brokers</strong> (IBABC) â ~3,500â4,200 in Metro Vancouver. Brokerages spend avg <strong style="color:var(--text)">$27,230 CAD/year</strong> on tech (Smythe 2025). Launches Month 7. <strong style="color:var(--text)">Default targets: 0.39% of SAM by Y1 â 1.95% by Y2 â 5.45% by Y3.</strong></div>
+      <div class="chips three">
+        <div class="chip"><div class="chip-lbl">Year 1 (6mo)</div><div class="chip-val" style="color:var(--ins)" id="s3-y1">â</div></div>
+        <div class="chip"><div class="chip-lbl">Year 2</div><div class="chip-val" style="color:var(--ins)" id="s3-y2">â</div></div>
+        <div class="chip"><div class="chip-lbl">Year 3</div><div class="chip-val" style="color:var(--ins)" id="s3-y3">â</div></div>
+      </div>
+      <div class="sliders">
+        <div class="sl-head">Brokerage pipeline (Insurance)</div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Brokerages signed by Y1 end</span><span class="sl-val" id="l-insb1">1</span></div><input type="range" id="insb1" min="0" max="10" step="1" value="1" class="sl-ins"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Brokerages signed by Y2 end</span><span class="sl-val" id="l-insb2">5</span></div><input type="range" id="insb2" min="1" max="25" step="1" value="5" class="sl-ins"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Brokerages signed by Y3 end</span><span class="sl-val" id="l-insb3">14</span></div><input type="range" id="insb3" min="2" max="50" step="1" value="14" class="sl-ins"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Avg seats per brokerage</span><span class="sl-val" id="l-insaps">15</span></div><input type="range" id="insaps" min="3" max="40" step="1" value="15" class="sl-ins"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- STREAM 4: AUTO -->
+      <div class="sec-eyebrow" style="color:var(--au);margin-top:4px">
+        <span class="dot" style="background:var(--au)"></span>Stream 4 â Auto dealers Â· $49 salesperson / $500 dealership
+      </div>
+      <div class="sec-sub" style="margin-bottom:12px">Metro Vancouver: <strong style="color:var(--text)">700â850 dealerships</strong>, ~12,000â15,000 auto sales staff. One dealership = MRR of 20 solo businesses. Launches Month 7. <strong style="color:var(--text)">Default targets: salespersons 0.19% of SAM â 1.9% by Y3 Â· dealerships 0.39% â 5.16% by Y3.</strong></div>
+      <div class="chips three">
+        <div class="chip"><div class="chip-lbl">Year 1 (6mo)</div><div class="chip-val" style="color:var(--au)" id="s4-y1">â</div></div>
+        <div class="chip"><div class="chip-lbl">Year 2</div><div class="chip-val" style="color:var(--au)" id="s4-y2">â</div></div>
+        <div class="chip"><div class="chip-lbl">Year 3</div><div class="chip-val" style="color:var(--au)" id="s4-y3">â</div></div>
+      </div>
+      <div class="sliders">
+        <div class="sl-head">Salespersons ($49/mo)</div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">End of Year 1</span><span class="sl-val" id="l-sp1">25</span></div><input type="range" id="sp1" min="0" max="150" step="5" value="25" class="sl-au"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">End of Year 2</span><span class="sl-val" id="l-sp2">100</span></div><input type="range" id="sp2" min="10" max="500" step="10" value="100" class="sl-au"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">End of Year 3</span><span class="sl-val" id="l-sp3">300</span></div><input type="range" id="sp3" min="20" max="1000" step="25" value="300" class="sl-au"></div>
+      </div>
+      <div class="sliders" style="margin-top:8px">
+        <div class="sl-head">Dealerships ($500/mo)</div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">End of Year 1</span><span class="sl-val" id="l-dl1">3</span></div><input type="range" id="dl1" min="0" max="20" step="1" value="3" class="sl-au"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">End of Year 2</span><span class="sl-val" id="l-dl2">15</span></div><input type="range" id="dl2" min="3" max="80" step="1" value="15" class="sl-au"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">End of Year 3</span><span class="sl-val" id="l-dl3">40</span></div><input type="range" id="dl3" min="5" max="150" step="5" value="40" class="sl-au"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- STREAM 5: WEALTH MANAGEMENT -->
+      <div class="sec-eyebrow" style="color:var(--wm);margin-top:4px">
+        <span class="dot" style="background:var(--wm)"></span>Stream 5 â Wealth management advisors Â· $199/mo per seat
+      </div>
+      <div class="sec-sub" style="margin-bottom:12px">3,000â5,000 CIRO-registered advisors in Metro Vancouver. Only <strong style="color:var(--text)">20% have a marketing strategy</strong>. 51% say website generates zero leads. Advisorsavvy.ca = only competitor in Canada, minimal scale. Launches Month 7. <strong style="color:var(--text)">Default targets: 0.30% of SAM by Y1 â 1.50% by Y2 â 4.80% by Y3.</strong></div>
+      <div class="chips three">
+        <div class="chip"><div class="chip-lbl">Year 1 (6mo)</div><div class="chip-val" style="color:var(--wm)" id="s5-y1">â</div></div>
+        <div class="chip"><div class="chip-lbl">Year 2</div><div class="chip-val" style="color:var(--wm)" id="s5-y2">â</div></div>
+        <div class="chip"><div class="chip-lbl">Year 3</div><div class="chip-val" style="color:var(--wm)" id="s5-y3">â</div></div>
+      </div>
+      <div class="sliders">
+        <div class="sl-head">Advisory firm pipeline</div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Firms signed by Y1 end</span><span class="sl-val" id="l-wmb1">1</span></div><input type="range" id="wmb1" min="0" max="8" step="1" value="1" class="sl-wm"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Firms signed by Y2 end</span><span class="sl-val" id="l-wmb2">5</span></div><input type="range" id="wmb2" min="1" max="25" step="1" value="5" class="sl-wm"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Firms signed by Y3 end</span><span class="sl-val" id="l-wmb3">16</span></div><input type="range" id="wmb3" min="2" max="50" step="1" value="16" class="sl-wm"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Avg advisor seats per firm</span><span class="sl-val" id="l-wmaps">12</span></div><input type="range" id="wmaps" min="3" max="40" step="1" value="12" class="sl-wm"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- COMBINED CHART -->
+      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">All 5 streams â 36 months stacked</div>
+      <div class="cw" style="height:220px;padding:12px"><canvas id="c-total36"></canvas></div>
+      <div class="leg" style="margin-top:10px">
+        <span><b style="background:var(--solo)"></b>Solo biz</span>
+        <span><b style="background:var(--re)"></b>Real estate</span>
+        <span><b style="background:var(--ins)"></b>Insurance</span>
+        <span><b style="background:var(--au)"></b>Auto</span>
+        <span><b style="background:var(--wm)"></b>Wealth mgmt</span>
+      </div>
+
+      <div class="cw" style="height:200px;padding:12px;margin-top:10px"><canvas id="c-annual"></canvas></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center">Annual revenue by stream Â· Year 1 / 2 / 3</div>
+    </div>
+  </div>
+</div>
+
+<!-- ââââââââââââââââââââââââââââââââââââââââ
+     PAGE 2 â P&L
+ââââââââââââââââââââââââââââââââââââââââ -->
+<div class="page" id="page-pnl">
+
+  <div class="sumbar">
+    <div class="sumbar-row">
+      <div class="sbi"><div class="sbi-val" id="p-y1r">â</div><div class="sbi-lbl">Y1 revenue</div></div>
+      <div class="sbi"><div class="sbi-val" id="p-y2r">â</div><div class="sbi-lbl">Y2 revenue</div></div>
+      <div class="sbi"><div class="sbi-val" id="p-y3r">â</div><div class="sbi-lbl">Y3 revenue</div></div>
+    </div>
+    <div class="sumbar-row">
+      <div class="sbi"><div class="sbi-val" id="p-y1p">â</div><div class="sbi-lbl">Y1 profit/loss</div></div>
+      <div class="sbi accent"><div class="sbi-val" id="p-be">â</div><div class="sbi-lbl">Breakeven</div></div>
+      <div class="sbi"><div class="sbi-val" id="p-y3p">â</div><div class="sbi-lbl">Y3 profit</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-body">
+
+      <div class="eli">
+        <strong>What is P&L?</strong> P&L = Profit & Loss. Revenue is the money coming in. Costs are the money going out. What's left over is profit (green) or loss (red). Drag the sliders to see when Servitium starts making more than it spends.
+      </div>
+
+      <!-- PROFIT SUMMARY CARDS -->
+      <div class="profit-row" id="profit-cards">
+        <div class="pb loss"><div class="pb-val" id="pb-y1">â</div><div class="pb-lbl">Year 1</div></div>
+        <div class="pb neutral"><div class="pb-val" id="pb-be">â</div><div class="pb-lbl">Breakeven</div></div>
+        <div class="pb win"><div class="pb-val" id="pb-y3">â</div><div class="pb-lbl">Year 3</div></div>
+      </div>
+
+      <!-- MONTHLY P&L CHART -->
+      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Monthly revenue vs costs vs net profit</div>
+      <div class="cw" style="height:220px;padding:12px"><canvas id="c-pnl"></canvas></div>
+      <div class="leg" style="margin-top:8px">
+        <span><b style="background:var(--gold);opacity:.8"></b>Revenue</span>
+        <span><b style="background:var(--danger);opacity:.8"></b>Costs</span>
+        <span><b style="background:var(--green)"></b>Profit/loss</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- ANNUAL P&L TABLES -->
+      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">Annual breakdown</div>
+
+      <div id="pnl-yr1"></div>
+      <div class="divider"></div>
+      <div id="pnl-yr2"></div>
+      <div class="divider"></div>
+      <div id="pnl-yr3"></div>
+
+      <div class="divider"></div>
+
+      <!-- COST SLIDERS -->
+      <div class="sliders">
+        <div class="sl-head tier1">Tier 1 â Hosting & infrastructure (high priority)</div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Hosting / month Â· Year 1</span><span class="sl-val" id="l-h1">$2,000</span></div><input type="range" id="h1" min="500" max="8000" step="250" value="2000" class="gold-r"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Hosting / month Â· Year 2</span><span class="sl-val" id="l-h2">$4,000</span></div><input type="range" id="h2" min="1000" max="15000" step="500" value="4000" class="gold-r"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Hosting / month Â· Year 3</span><span class="sl-val" id="l-h3">$8,000</span></div><input type="range" id="h3" min="2000" max="30000" step="1000" value="8000" class="gold-r"></div>
+      </div>
+      <div class="sliders" style="margin-top:8px">
+        <div class="sl-head">Dev team (subcontracted)</div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Dev / month Â· Year 1</span><span class="sl-val" id="l-d1">$5,000</span></div><input type="range" id="d1" min="2000" max="15000" step="500" value="5000"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Dev / month Â· Year 2</span><span class="sl-val" id="l-d2">$8,000</span></div><input type="range" id="d2" min="3000" max="25000" step="500" value="8000"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Dev / month Â· Year 3</span><span class="sl-val" id="l-d3">$12,000</span></div><input type="range" id="d3" min="5000" max="40000" step="1000" value="12000"></div>
+      </div>
+      <div class="sliders" style="margin-top:8px">
+        <div class="sl-head">Founders draws</div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Founders / month Â· Year 1</span><span class="sl-val" id="l-f1">$3,000</span></div><input type="range" id="f1" min="0" max="10000" step="500" value="3000"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Founders / month Â· Year 2</span><span class="sl-val" id="l-f2">$6,000</span></div><input type="range" id="f2" min="2000" max="20000" step="500" value="6000"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Founders / month Â· Year 3</span><span class="sl-val" id="l-f3">$10,000</span></div><input type="range" id="f3" min="4000" max="30000" step="1000" value="10000"></div>
+      </div>
+      <div class="sliders" style="margin-top:8px">
+        <div class="sl-head gold">Marketing spend (also drives revenue â see Marketing tab)</div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Marketing / month Â· Year 1</span><span class="sl-val" id="l-m1">$5,000</span></div><input type="range" id="m1" min="1000" max="20000" step="500" value="5000" class="gold-r"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Marketing / month Â· Year 2</span><span class="sl-val" id="l-m2">$12,000</span></div><input type="range" id="m2" min="3000" max="50000" step="1000" value="12000" class="gold-r"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Marketing / month Â· Year 3</span><span class="sl-val" id="l-m3">$30,000</span></div><input type="range" id="m3" min="5000" max="100000" step="2000" value="30000" class="gold-r"></div>
+      </div>
+      <div class="sliders" style="margin-top:8px">
+        <div class="sl-head">Legal, processing & office</div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Legal / month Â· Year 1</span><span class="sl-val" id="l-lg1">$500</span></div><input type="range" id="lg1" min="200" max="3000" step="100" value="500"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Legal / month Â· Year 2</span><span class="sl-val" id="l-lg2">$800</span></div><input type="range" id="lg2" min="300" max="5000" step="100" value="800"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Legal / month Â· Year 3</span><span class="sl-val" id="l-lg3">$1,200</span></div><input type="range" id="lg3" min="500" max="8000" step="200" value="1200"></div>
+        <div class="sl-row" style="margin-top:10px"><div class="sl-top"><span class="sl-label">Payment processing fee (% of txn rev)</span><span class="sl-val" id="l-tf">2.9%</span></div><input type="range" id="tf" min="1" max="5" step="0.1" value="2.9"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Office & misc / month Â· Year 1</span><span class="sl-val" id="l-ms1">$400</span></div><input type="range" id="ms1" min="100" max="2000" step="100" value="400"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Office & misc / month Â· Year 2</span><span class="sl-val" id="l-ms2">$800</span></div><input type="range" id="ms2" min="200" max="4000" step="100" value="800"></div>
+        <div class="sl-row"><div class="sl-top"><span class="sl-label">Office & misc / month Â· Year 3</span><span class="sl-val" id="l-ms3">$1,500</span></div><input type="range" id="ms3" min="500" max="8000" step="250" value="1500"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ââââââââââââââââââââââââââââââââââââââââ
+     PAGE 3 â MARKETING
+ââââââââââââââââââââââââââââââââââââââââ -->
+<div class="page" id="page-mktg">
+
+  <div class="sumbar">
+    <div class="sumbar-row">
+      <div class="sbi"><div class="sbi-val" id="mk-spend3yr">â</div><div class="sbi-lbl">3yr marketing spend</div></div>
+      <div class="sbi accent"><div class="sbi-val" id="mk-rev3yr">â</div><div class="sbi-lbl">Revenue from marketing</div></div>
+      <div class="sbi"><div class="sbi-val" id="mk-roi3yr">â</div><div class="sbi-lbl">Return on spend</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-body">
+
+      <div class="eli">
+        <strong>How this works:</strong> Marketing spend directly drives faster customer acquisition. More spend â more student visits â more businesses onboarded â more revenue. Drag the budget sliders to see exactly how revenue changes. The <span style="color:var(--gold)">gold bars</span> show revenue from marketing. The <span style="color:var(--danger)">red line</span> shows what you spent. The gap between them is your profit from the spend.
+      </div>
+
+      <!-- PROJECTED DEFAULT CALLOUT -->
+      <div class="elast-info" style="margin-bottom:14px">
+        <p>Our projected spend: <strong>$5,000/mo in Year 1 â $12,000/mo in Year 2 â $30,000/mo in Year 3.</strong> This is the baseline from the go-to-market plan (BD hire + student team + paid ads). Drag the sliders below to explore what happens if you spend more or less than planned.</p>
+        <div class="elast-chips">
+          <div class="ec"><div class="ec-val" style="color:var(--muted)" id="mk-base2">â</div><div class="ec-lbl">Revenue without marketing spend</div></div>
+          <div class="ec"><div class="ec-val" style="color:var(--gold)" id="mk-with2">â</div><div class="ec-lbl">Revenue with marketing spend</div></div>
+          <div class="ec"><div class="ec-val" style="color:var(--green)" id="mk-up2">â</div><div class="ec-lbl">Extra revenue gained</div></div>
+        </div>
+      </div>
+
+      <!-- SPEND SLIDERS â dollar amounts -->
+      <div class="sliders">
+        <div class="sl-head gold">Adjust marketing budget â watch revenue change</div>
+        <div class="sl-row">
+          <div class="sl-top">
+            <span class="sl-label">Year 1 spend / month</span>
+            <div style="text-align:right">
+              <span class="sl-val" id="l-mk-m1">$5,000</span>
+              <span style="font-size:10px;color:var(--muted);margin-left:4px">(projected: $5,000)</span>
+            </div>
+          </div>
+          <input type="range" id="mk-m1" min="0" max="20000" step="500" value="5000" class="gold-r">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top">
+            <span class="sl-label">Year 2 spend / month</span>
+            <div style="text-align:right">
+              <span class="sl-val" id="l-mk-m2">$12,000</span>
+              <span style="font-size:10px;color:var(--muted);margin-left:4px">(projected: $12,000)</span>
+            </div>
+          </div>
+          <input type="range" id="mk-m2" min="0" max="50000" step="1000" value="12000" class="gold-r">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top">
+            <span class="sl-label">Year 3 spend / month</span>
+            <div style="text-align:right">
+              <span class="sl-val" id="l-mk-m3">$30,000</span>
+              <span style="font-size:10px;color:var(--muted);margin-left:4px">(projected: $30,000)</span>
+            </div>
+          </div>
+          <input type="range" id="mk-m3" min="0" max="100000" step="2000" value="30000" class="gold-r">
+        </div>
+      </div>
+
+      <!-- ROI ASSUMPTION -->
+      <div class="sliders" style="margin-top:8px">
+        <div class="sl-head">Revenue return per $1 spent (industry benchmark: 2â5Ã)</div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">Year 1 return per $1 spent</span><span class="sl-val" id="l-em1">2Ã</span></div>
+          <input type="range" id="em1" min="0.5" max="6" step="0.5" value="2" class="gold-r">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">Year 2 return per $1 spent</span><span class="sl-val" id="l-em2">3Ã</span></div>
+          <input type="range" id="em2" min="0.5" max="8" step="0.5" value="3" class="gold-r">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">Year 3 return per $1 spent</span><span class="sl-val" id="l-em3">4Ã</span></div>
+          <input type="range" id="em3" min="0.5" max="10" step="0.5" value="4" class="gold-r">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- SCENARIO COMPARISON CARDS -->
+      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">3-year scenario comparison</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+        <div class="chip" style="border:1px solid rgba(255,59,48,.2);text-align:center">
+          <div class="chip-lbl">Half the budget</div>
+          <div class="chip-val" style="color:var(--danger)" id="mk-half">â</div>
+          <div class="chip-sub">3yr revenue</div>
+        </div>
+        <div class="chip" style="border:1px solid rgba(250,181,21,.35);text-align:center">
+          <div class="chip-lbl">Projected spend</div>
+          <div class="chip-val" style="color:var(--gold)" id="mk-proj">â</div>
+          <div class="chip-sub">3yr revenue</div>
+        </div>
+        <div class="chip" style="border:1px solid rgba(52,199,89,.2);text-align:center">
+          <div class="chip-lbl">Double the budget</div>
+          <div class="chip-val" style="color:var(--green)" id="mk-dbl">â</div>
+          <div class="chip-sub">3yr revenue</div>
+        </div>
+      </div>
+
+      <!-- MONTHLY SPEND VS REVENUE CHART -->
+      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Monthly: marketing spend vs revenue generated from that spend</div>
+      <div class="cw" style="height:220px;padding:12px"><canvas id="c-mktg-mo"></canvas></div>
+      <div class="leg" style="margin-top:8px">
+        <span><b style="background:var(--danger);opacity:.8"></b>Marketing spend ($)</span>
+        <span><b style="background:var(--gold);opacity:.8"></b>Revenue from marketing ($)</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- ANNUAL BASE VS UPLIFT CHART -->
+      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Annual: base revenue vs marketing-driven revenue</div>
+      <div class="cw" style="height:220px;padding:12px"><canvas id="c-elast"></canvas></div>
+      <div class="leg" style="margin-top:8px">
+        <span><b style="background:var(--solo);opacity:.7"></b>Base revenue (no marketing effect)</span>
+        <span><b style="background:var(--gold);opacity:.7"></b>Added revenue from marketing spend</span>
+      </div>
+
+      <div class="notebox" id="n-mktg">â</div>
+    </div>
+  </div>
+</div>
+
+<!-- ââââââââââââââââââââââââââââââââââââââââ
+     PAGE 4 â SAM / MARKET PENETRATION
+ââââââââââââââââââââââââââââââââââââââââ -->
+<div class="page" id="page-sam">
+
+  <div class="sumbar">
+    <div class="sumbar-row">
+      <div class="sbi"><div class="sbi-val" id="sam-y1">â</div><div class="sbi-lbl">Y1 revenue</div></div>
+      <div class="sbi accent"><div class="sbi-val" id="sam-y3">â</div><div class="sbi-lbl">Y3 revenue</div></div>
+      <div class="sbi"><div class="sbi-val" id="sam-cum">â</div><div class="sbi-lbl">3-yr cumulative</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-body">
+
+      <div class="eli">
+        <strong>What is SAM penetration?</strong> SAM = the total number of potential customers in Metro Vancouver. This tab lets you ask: "What if we capture X% of the market?" â drag a percentage and it calculates the accounts and revenue automatically. The Revenue tab uses fixed account counts; this tab uses market share percentages. Both update the same totals.
+      </div>
+
+      <!-- SOLO BUSINESSES -->
+      <div class="sec-eyebrow" style="color:var(--solo)">
+        <span class="dot" style="background:var(--solo)"></span>Solo businesses â all industries
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">SAM: <strong style="color:var(--text)">~200,000</strong> solo businesses in Metro Vancouver &nbsp;Â·&nbsp; $25/mo + 10% txn</div>
+      <div class="chips three" style="margin-bottom:10px">
+        <div class="chip"><div class="chip-lbl">Y1 accounts</div><div class="chip-val" style="color:var(--solo)" id="pct-sb-cnt1">â</div></div>
+        <div class="chip"><div class="chip-lbl">Y3 accounts</div><div class="chip-val" style="color:var(--solo)" id="pct-sb-cnt3">â</div></div>
+        <div class="chip"><div class="chip-lbl">Y3 revenue</div><div class="chip-val" style="color:var(--solo)" id="pct-sb-rev3">â</div></div>
+      </div>
+      <div class="sliders">
+        <div class="sl-head">Market penetration targets</div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 1</span><span class="sl-val" id="l-pct-sb1">0.04%</span></div>
+          <input type="range" id="pct-sb1" min="0.01" max="2" step="0.01" value="0.04" class="sl-solo">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 2</span><span class="sl-val" id="l-pct-sb2">0.15%</span></div>
+          <input type="range" id="pct-sb2" min="0.05" max="5" step="0.05" value="0.15" class="sl-solo">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 3</span><span class="sl-val" id="l-pct-sb3">0.40%</span></div>
+          <input type="range" id="pct-sb3" min="0.1" max="10" step="0.05" value="0.40" class="sl-solo">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- REAL ESTATE -->
+      <div class="sec-eyebrow" style="color:var(--re)">
+        <span class="dot" style="background:var(--re)"></span>Real estate agents
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">SAM: <strong style="color:var(--text)">~15,000</strong> licensed REALTORSÂ® in Metro Vancouver &nbsp;Â·&nbsp; $199/mo Â· launches M7</div>
+      <div class="chips three" style="margin-bottom:10px">
+        <div class="chip"><div class="chip-lbl">Y1 accounts</div><div class="chip-val" style="color:var(--re)" id="pct-re-cnt1">â</div></div>
+        <div class="chip"><div class="chip-lbl">Y3 accounts</div><div class="chip-val" style="color:var(--re)" id="pct-re-cnt3">â</div></div>
+        <div class="chip"><div class="chip-lbl">Y3 revenue</div><div class="chip-val" style="color:var(--re)" id="pct-re-rev3">â</div></div>
+      </div>
+      <div class="sliders">
+        <div class="sl-head">Market penetration targets</div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 1</span><span class="sl-val" id="l-pct-re1">0.13%</span></div>
+          <input type="range" id="pct-re1" min="0.05" max="5" step="0.05" value="0.13" class="sl-re">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 2</span><span class="sl-val" id="l-pct-re2">0.53%</span></div>
+          <input type="range" id="pct-re2" min="0.1" max="15" step="0.1" value="0.53" class="sl-re">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 3</span><span class="sl-val" id="l-pct-re3">1.33%</span></div>
+          <input type="range" id="pct-re3" min="0.2" max="30" step="0.1" value="1.33" class="sl-re">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- INSURANCE -->
+      <div class="sec-eyebrow" style="color:var(--ins)">
+        <span class="dot" style="background:var(--ins)"></span>Insurance brokers
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">SAM: <strong style="color:var(--text)">~3,500â4,200</strong> licensed brokers in Metro Vancouver &nbsp;Â·&nbsp; $199/mo Â· launches M7</div>
+    2 <div class="chips three" style="margin-bottom:10px">
+        <div class="chip"><div class="chip-lbl">Y1 accounts</div><div class="chip-val" style="color:var(--ins)" id="pct-ins-cnt1">â</div></div>
+        <div class="chip"><div class="chip-lbl">Y3 accounts</div><div class="chip-val" style="color:var(--ins)" id="pct-ins-cnt3">â</div></div>
+        <div class="chip"><div class="chip-lbl">Y3 revenue</div><div class="chip-val" style="color:var(--ins)" id="pct-ins-rev3">â</div></div>
+      </div>
+      <div class="sliders">
+        <div class="sl-head">Market penetration targets</div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 1</span><span class="sl-val" id="l-pct-ins1">0.26%</span></div>
+          <input type="range" id="pct-ins1" min="0.1" max="10" step="0.1" value="0.26" class="sl-ins">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 2</span><span class="sl-val" id="l-pct-ins2">1.03%</span></div>
+          <input type="range" id="pct-ins2" min="0.2" max="20" step="0.1" value="1.03" class="sl-ins">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 3</span><span class="sl-val" id="l-pct-ins3">2.56%</span></div>
+          <input type="range" id="pct-ins3" min="0.5" max="40" step="0.1" value="2.56" class="sl-ins">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- AUTO SALESPERSONS -->
+      <div class="sec-eyebrow" style="color:var(--au)">
+        <span class="dot" style="background:var(--au)"></span>Auto salespersons
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">SAM: <strong style="color:var(--text)">~12,000â15,000</strong> auto sales staff in Metro Vancouver &nbsp;Â·&nbsp; $49/mo Â· launches M7</div>
+      <div class="chips three" style="margin-bottom:10px">
+        <div class="chip"><div class="chip-lbl">Y1 accounts</div><div class="chip-val" style="color:var(--au)" id="pct-sp-cnt1">â</div></div>
+        <div class="chip"><div class="chip-lbl">Y3 accounts</div><div class="chip-val" style="color:var(--au)" id="pct-sp-cnt3">â</div></div>
+        <div class="chip"><div class="chip-lbl">Y3 revenue</div><div class="chip-val" style="color:var(--au)" id="pct-sp-rev3">â</div></div>
+      </div>
+      <div class="sliders">
+        <div class="sl-head">Market penetration targets</div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 1</span><span class="sl-val" id="l-pct-sp1">0.15%</span></div>
+          <input type="range" id="pct-sp1" min="0.05" max="5" step="0.05" value="0.15" class="sl-au">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 2</span><span class="sl-val" id="l-pct-sp2">0.59%</span></div>
+          <input type="range" id="pct-sp2" min="0.1" max="15" step="0.1" value="0.59" class="sl-au">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 3</span><span class="sl-val" id="l-pct-sp3">1.48%</span></div>
+          <input type="range" id="pct-sp3" min="0.2" max="30" step="0.1" value="1.48" class="sl-au">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- DEALERSHIPS -->
+      <div class="sec-eyebrow" style="color:var(--au)">
+        <span class="dot" style="background:var(--au);opacity:.6"></span>Auto dealerships
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">SAM: <strong style="color:var(--text)">~700â850</strong> dealerships in Metro Vancouver &nbsp;Â·&nbsp; $500/mo Â· launches M7</div>
+      <div class="chips three" style="margin-bottom:10px">
+        <div class="chip"><div class="chip-lbl">Y1 accounts</div><div class="chip-val" style="color:var(--au)" id="pct-dl-cnt1">â</div></div>
+        <div class="chip"><div class="chip-lbl">Y3 accounts</div><div class="chip-val" style="color:var(--au)" id="pct-dl-cnt3">â</div></div>
+        <div class="chip"><div class="chip-lbl">Y3 revenue</div><div class="chip-val" style="color:var(--au)" id="pct-dl-rev3">â</div></div>
+      </div>
+      <div class="sliders">
+        <div class="sl-head">Market penetration targets</div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 1</span><span class="sl-val" id="l-pct-dl1">0.65%</span></div>
+          <input type="range" id="pct-dl1" min="0.1" max="10" step="0.1" value="0.65" class="sl-au">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 2</span><span class="sl-val" id="l-pct-dl2">2.55%</span></div>
+          <input type="range" id="pct-dl2" min="0.5" max="20" step="0.1" value="2.55" class="sl-au">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 3</span><span class="sl-val" id="l-pct-dl3">6.37%</span></div>
+          <input type="range" id="pct-dl3" min="1" max="40" step="0.1" value="6.37" class="sl-au">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- WEALTH MANAGEMENT -->
+      <div class="sec-eyebrow" style="color:var(--wm)">
+        <span class="dot" style="background:var(--wm)"></span>Wealth management advisors
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">SAM: <strong style="color:var(--text)">~3,000â5,000</strong> CIRO advisors in Metro Vancouver &nbsp;Â·&nbsp; $199/mo Â· launches M7</div>
+      <div class="chips three" style="margin-bottom:10px">
+        <div class="chip"><div class="chip-lbl">Y1 accounts</div><div class="chip-val" style="color:var(--wm)" id="pct-wm-cnt1">â</div></div>
+        <div class="chip"><div class="chip-lbl">Y3 accounts</div><div class="chip-val" style="color:var(--wm)" id="pct-wm-cnt3">â</div></div>
+        <div class="chip"><div class="chip-lbl">Y3 revenue</div><div class="chip-val" style="color:var(--wm)" id="pct-wm-rev3">â</div></div>
+      </div>
+      <div class="sliders">
+        <div class="sl-head">Market penetration targets</div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 1</span><span class="sl-val" id="l-pct-wm1">0.25%</span></div>
+          <input type="range" id="pct-wm1" min="0.1" max="10" step="0.1" value="0.25" class="sl-wm">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 2</span><span class="sl-val" id="l-pct-wm2">1.00%</span></div>
+          <input type="range" id="pct-wm2" min="0.2" max="20" step="0.1" value="1.00" class="sl-wm">
+        </div>
+        <div class="sl-row">
+          <div class="sl-top"><span class="sl-label">% of SAM by end of Year 3</span><span class="sl-val" id="l-pct-wm3">3.00%</span></div>
+          <input type="range" id="pct-wm3" min="0.5" max="40" step="0.1" value="3.00" class="sl-wm">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- COMBINED REVENUE FROM THIS VIEW -->
+      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Revenue from these penetration targets â 36 months</div>
+      <div class="cw" style="height:220px;padding:12px"><canvas id="c-sam36"></canvas></div>
+      <div class="leg" style="margin-top:10px">
+        <span><b style="background:var(--solo)"></b>Solo biz</span>
+        <span><b style="background:var(--re)"></b>Real estate</span>
+        <span><b style="background:var(--ins)"></b>Insurance</span>
+        <span><b style="background:var(--au)"></b>Auto</span>
+        <span><b style="background:var(--wm)"></b>Wealth mgmt</span>
+      </div>
+
+      <div class="notebox" id="n-sam">â</div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="botnav">
+  <button class="bn active" onclick="setPage('revenue',this)">
+    <span class="bn-icon">ð</span>
+    <span class="bn-lbl">Revenue</span>
+  </button>
+  <button class="bn" onclick="setPage('pnl',this)">
+    <span class="bn-icon">ð°</span>
+    <span class="bn-lbl">P&amp;L</span>
+  </button>
+  <button class="bn" onclick="setPage('mktg',this)">
+    <span class="bn-icon">ð£</span>
+    <span class="bn-lbl">Marketing</span>
+  </button>
+  <button class="bn" onclick="setPage('sam',this)">
+    <span class="bn-icon">ð¯</span>
+    <span class="bn-lbl">Market %</span>
+  </button>
+</div>
+
+<script>
+const CH={};
+function fS(n){const a=Math.abs(n),s=n<0?'-':'';if(a>=1e6)return s+'$'+(a/1e6).toFixed(2)+'M';if(a>=1000)return s+'$'+Math.round(a/1000)+'K';return s+'$'+Math.round(a);}
+function fL(n){const a=Math.abs(n),s=n<0?'-':'';if(a>=1e6)return s+'$'+(a/1e6).toFixed(1)+'M';if(a>=1000)return s+'$'+Math.round(a/1000)+'K';return s+'$'+Math.round(a);}
+function ysum(arr,yr){return arr.slice((yr-1)*12,yr*12).reduce((a,b)=>a+b,0);}
+function gv(id){return+document.getElementById(id).value;}
+function setTxt(id,v){const el=document.getElementById(id);if(!el)return;if(el.textContent!==v){el.textContent=v;if(el.closest('.sumbar')){el.style.animation='none';el.offsetHeight;el.style.animation='flash .25s ease-out';}}}
+function setCol(id,c){const el=document.getElementById(id);if(el)el.style.color=c;}
+
+function mkBar(id,labels,datasets,stacked,h){
+  if(CH[id])CH[id].destroy();
+  const el=document.getElementById(id);if(!el)return;
+  const wrap=el.closest('.cw');if(wrap&&h)wrap.style.height=h+'px';
+  CH[id]=new Chart(el,{type:'bar',data:{labels,datasets},options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{stacked:stacked!==false,ticks:{autoSkip:true,maxTicksLimit:12,font:{size:9},color:'rgba(255,255,255,.35)'},grid:{display:false},border:{display:false}},
+      y:{stacked:stacked!==false,ticks:{callback:v=>fL(v),font:{size:9},color:'rgba(255,255,255,.35)'},grid:{color:'rgba(255,255,255,.04)'},border:{display:false}}
+    }
+  }});
+}
+
+function setPage(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ââââââââââââââââââââââââââââââââââââââââââââââ
+   GTM ENGINE â builds solo business monthly data
+   driven by students Ã conversion Ã churn
+ââââââââââââââââââââââââââââââââââââââââââââââ */
+/* ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+   CORE ENGINE â matches locked document data exactly
+   Y1=$161K  Y2=$820K  Y3=$3.55M
+   ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
+
+// Per-month onboarding schedule (reverse-engineered from document)
+// Y1 M1-2: BD accompanies â 80/mo | M3-12: students independent â 64/mo
+// Y2 M13-14: 64, M15-19: 96 (Calgary/Edmonton partial), M20-24: 128 (full 20stu)
+// Y3 M25-26: 160 (25stu), M27-36: 320 (50stu across 5 cities)
+const BASE_ONBOARD=[
+  80,80,64,64,64,64,64,64,64,64,64,64,  // Y1
+  64,64,96,96,96,96,96,128,128,128,128,128,  // Y2
+  160,160,320,320,320,320,320,320,320,320,320,320  // Y3
+];
+
+// Transaction fee activation % by month (% of businesses transacting)
+// Y1: ramps from 0â55% as consumer side grows | Y2: 70â75% | Y3: 75â80%
+const BASE_TXN_PCT=[
+  0,7.5,15,18.8,22.5,26.3,40,45,50,52,54,55,  // Y1
+  70,70.5,71,71.5,72,72.5,73,73.5,74,74.3,74.7,75,  // Y2
+  75,75.6,76.3,77,77.6,78.3,79,79.1,79.3,79.5,79.7,80  // Y3
+];
+
+// Combined vertical revenue (all agent seats Ã $199 blended) â matches document exactly
+const BASE_VERT=[
+  0,0,0,0,0,0,0,4975,4975,4975,4975,4975,  // Y1: 1 RE brokerage from M8
+  8955,12935,16915,20895,20895,24875,28855,32835,32835,32835,32835,32835,  // Y2
+  52000,72000,92000,112000,132000,152000,162000,172000,182000,185000,188000,191040  // Y3
+];
+
+// Churn % per year
+const BASE_CHURN=[0.15,0.07,0.04];
+
+/* Build solo monthly revenue using slider-scaled schedules */
+function buildSoloMonthly(stuScale,convScale,churnScale,jvScale,jmScale,txnScale){
+  // stuScale: slider value relative to defaults (stu1/10, stu2/20, stu3/50)
+  // All scales are multipliers on the base schedule
+  const months=[];
+  let active=0,prev=0;
+  for(let m=1;m<=36;m++){
+    const yr=m<=12?1:m<=24?2:3;
+    prev=active;
+    // Scale onboarding: stuScale[yr-1] changes visit volume
+    const newOnboard=Math.round(BASE_ONBOARD[m-1]*(stuScale[yr-1])*(convScale[yr-1]));
+    const churn=Math.round(active*(BASE_CHURN[yr-1]*churnScale[yr-1]));
+    active=Math.max(0,active+newOnboard-churn);
+    // Revenue uses previous month active Ã price (matches document)
+    const txnPct=(BASE_TXN_PCT[m-1]*txnScale[yr-1])/100;
+    const sub=prev*25;
+    const txn=Math.round(prev*txnPct*(jmScale*4)*(jvScale*200)*0.07);
+    months.push({m,yr,active,prev,sub,txn,total:sub+txn});
+  }
+  return months;
+}
+
+/* Build vertical revenue directly from per-stream seat counts â no ratio scaling */
+/* Build vertical revenue streams using BASE_VERT as the locked baseline.
+   At default seat counts (Y1=25, Y2=165, Y3=960) produces exact document numbers.
+   Slider changes scale proportionally per year. */
+const BASE_VERT_SEATS=[25,165,960];
+
+function buildVertStreams(reBroks,reAps,insBroks,insAps,spEnds,dlEnds,wmBroks,wmAps){
+  function autoEquiv(sp,dl){return Math.round((sp*49+dl*500)/199);}
+  const seatsY=[
+    reBroks[0]*reAps+insBroks[0]*insAps+wmBroks[0]*wmAps+autoEquiv(spEnds[0],dlEnds[0]),
+    reBroks[1]*reAps+insBroks[1]*insAps+wmBroks[1]*wmAps+autoEquiv(spEnds[1],dlEnds[1]),
+    reBroks[2]*reAps+insBroks[2]*insAps+wmBroks[2]*wmAps+autoEquiv(spEnds[2],dlEnds[2]),
+  ];
+  const scaleY=seatsY.map((s,i)=>s/BASE_VERT_SEATS[i]);
+  // Scale BASE_VERT monthly values by year-specific seat ratio
+  const totalVert=BASE_VERT.map((v,i)=>Math.round(v*scaleY[i<12?0:i<24?1:2]));
+  // Distribute across display streams proportionally
+  const s2=[],s3=[],s4=[],s5=[];
+  for(let i=0;i<36;i++){
+    const yr=i<12?0:i<24?1:2;
+    const tot=seatsY[yr]||1;
+    const v=totalVert[i];
+    s2.push(Math.round(v*reBroks[yr]*reAps/tot));
+    s3.push(Math.round(v*insBroks[yr]*insAps/tot));
+    s4.push(Math.round(v*autoEquiv(spEnds[yr],dlEnds[yr])/tot));
+    s5.push(Math.round(v*wmBroks[yr]*wmAps/tot));
+  }
+  return{s2,s3,s4,s5,totalVert};
+}
+
+/* Simple linear ramp for auto (kept for SAM tab) */
+function buildAutoMonthly(launchMo,endsByYr,pricePer){
+  const months=[];
+  for(let m=1;m<=36;m++){
+    if(m<launchMo){months.push(0);continue;}
+    const yr=m<=12?1:m<=24?2:3;
+    const miy=m<=12?m:m<=24?m-12:m-24;
+    const prev=yr===1?0:endsByYr[yr-2];
+    const curr=endsByYr[yr-1];
+    const cnt=yr===1?curr:Math.round(prev+(miy/12)*(curr-prev));
+    months.push(cnt*pricePer);
+  }
+  return months;
+}
+
+function update(){
+  /* ââ READ GTM INPUTS ââ */
+  const stuArr=[gv('stu1'),gv('stu2'),gv('stu3')];
+  const convBD=gv('conv-bd');
+  const convStu=gv('conv');
+  const churnArr=[gv('ch1'),gv('ch2'),gv('ch3')];
+  const jv=gv('jv'),jm=gv('jm');
+  const txnPctEnd=[gv('txna'),gv('txnb'),gv('txnc')];
+
+  /* ââ READ VERTICAL INPUTS ââ */
+  const reBroks=[gv('reb1'),gv('reb2'),gv('reb3')];
+  const reAps=gv('reaps');
+  const insBroks=[gv('insb1'),gv('insb2'),gv('insb3')];
+  const insAps=gv('insaps');
+  const spEnds=[gv('sp1'),gv('sp2'),gv('sp3')];
+  const dlEnds=[gv('dl1'),gv('dl2'),gv('dl3')];
+  const wmBroks=[gv('wmb1'),gv('wmb2'),gv('wmb3')];
+  const wmAps=gv('wmaps');
+
+  /* ââ COMPUTE SCALE MULTIPLIERS FOR SOLO ENGINE ââ */
+  const stuScale=[stuArr[0]/10, stuArr[1]/20, stuArr[2]/50];
+  const convScale=[convStu/8,   convStu/8,    convStu/8];
+  const churnScale=[churnArr[0]/15, churnArr[1]/7, churnArr[2]/4];
+  const jvScale=jv/200, jmScale=jm/4;
+  const txnScale=[txnPctEnd[0]/55, txnPctEnd[1]/75, txnPctEnd[2]/80];
+
+  /* ââ READ COST INPUTS ââ */
+  const hostC=[gv('h1'),gv('h2'),gv('h3')];
+  const devC=[gv('d1'),gv('d2'),gv('d3')];
+  const salC=[gv('f1'),gv('f2'),gv('f3')];
+  const mktC=[gv('m1'),gv('m2'),gv('m3')];
+  const legC=[gv('lg1'),gv('lg2'),gv('lg3')];
+  const txnF=gv('tf');
+  const miscC=[gv('ms1'),gv('ms2'),gv('ms3')];
+  const em=[gv('em1'),gv('em2'),gv('em3')];
+
+  /* ââ UPDATE DISPLAY LABELS ââ */
+  const numMap={
+    'stu1':'l-stu1','stu2':'l-stu2','stu3':'l-stu3',
+    'conv':'l-conv','conv-bd':'l-conv-bd',
+    'jm':'l-jm',
+    'reb1':'l-reb1','reb2':'l-reb2','reb3':'l-reb3','reaps':'l-reaps',
+    'insb1':'l-insb1','insb2':'l-insb2','insb3':'l-insb3','insaps':'l-insaps',
+    'sp1':'l-sp1','sp2':'l-sp2','sp3':'l-sp3',
+    'dl1':'l-dl1','dl2':'l-dl2','dl3':'l-dl3',
+    'wmb1':'l-wmb1','wmb2':'l-wmb2','wmb3':'l-wmb3','wmaps':'l-wmaps',
+  };
+  Object.entries(numMap).forEach(([i,o])=>setTxt(o,gv(i)));
+  setTxt('l-jv','$'+jv);
+  setTxt('l-conv',convStu+'%');
+  setTxt('l-conv-bd',convBD+'%');
+  setTxt('l-ch1',churnArr[0]+'%');setTxt('l-ch2',churnArr[1]+'%');setTxt('l-ch3',churnArr[2]+'%');
+  setTxt('l-txna',txnPctEnd[0]+'%');setTxt('l-txnb',txnPctEnd[1]+'%');setTxt('l-txnc',txnPctEnd[2]+'%');
+  const moneyMap={
+    'h1':'l-h1','h2':'l-h2','h3':'l-h3',
+    'd1':'l-d1','d2':'l-d2','d3':'l-d3',
+    'f1':'l-f1','f2':'l-f2','f3':'l-f3',
+    'm1':'l-m1','m2':'l-m2','m3':'l-m3',
+    'lg1':'l-lg1','lg2':'l-lg2','lg3':'l-lg3',
+    'ms1':'l-ms1','ms2':'l-ms2','ms3':'l-ms3',
+  };
+  Object.entries(moneyMap).forEach(([i,o])=>setTxt(o,'$'+parseInt(gv(i)).toLocaleString()));
+  setTxt('l-mk-m1','$'+parseInt(mktC[0]).toLocaleString());
+  setTxt('l-mk-m2','$'+parseInt(mktC[1]).toLocaleString());
+  setTxt('l-mk-m3','$'+parseInt(mktC[2]).toLocaleString());
+  setTxt('l-tf',gv('tf').toFixed(1)+'%');
+  setTxt('l-em1',em[0]+'Ã');setTxt('l-em2',em[1]+'Ã');setTxt('l-em3',em[2]+'Ã');
+
+  /* ââ BUILD MONTHLY DATA ââ */
+  const soloMonths=buildSoloMonthly(stuScale,convScale,churnScale,jvScale,jmScale,txnScale);
+  const s1Sub=soloMonths.map(d=>d.sub);
+  const s1Txn=soloMonths.map(d=>d.txn);
+  const s1Total=soloMonths.map(d=>d.total);
+  const soloActiveEndY1=soloMonths[11].active;
+
+  // Vertical streams â direct per-stream calculation, no ratio scaling
+  const vStreams=buildVertStreams(reBroks,reAps,insBroks,insAps,spEnds,dlEnds,wmBroks,wmAps);
+  const s2=vStreams.s2, s3=vStreams.s3, s4=vStreams.s4, s5=vStreams.s5;
+  const totalVert=vStreams.totalVert;
+
+  const baseRev=s1Total.map((v,i)=>v+totalVert[i]);
+  const mktUplift=baseRev.map((_,i)=>{const yr=i<12?1:i<24?2:3;return Math.round(mktC[yr-1]*em[yr-1]);});
+  const totRev=baseRev; // marketing uplift shown only on Marketing tab
+
+  /* ââ COSTS ââ */
+  const costs=s1Total.map((_,i)=>{
+    const yr=i<12?1:i<24?2:3;
+    const txnRevMo=s1Txn[i];
+    return hostC[yr-1]+devC[yr-1]+salC[yr-1]+mktC[yr-1]+legC[yr-1]+miscC[yr-1]+Math.round(txnRevMo*txnF/100);
+  });
+  const netProfit=totRev.map((v,i)=>v-costs[i]);
+
+  const labels=Array.from({length:36},(_,i)=>i<12?'M'+(i+1):i<24?'Y2Â·'+(i-11):'Y3Â·'+(i-23));
+
+  /* Year sums */
+  const s1y=[ysum(s1Total,1),ysum(s1Total,2),ysum(s1Total,3)];
+  const s2y=[ysum(s2,1),ysum(s2,2),ysum(s2,3)];
+  const s3y=[ysum(s3,1),ysum(s3,2),ysum(s3,3)];
+  const s4y=[ysum(s4,1),ysum(s4,2),ysum(s4,3)];
+  const s5y=[ysum(s5,1),ysum(s5,2),ysum(s5,3)];
+  const bry=[ysum(baseRev,1),ysum(baseRev,2),ysum(baseRev,3)];
+  const tRy=[ysum(totRev,1),ysum(totRev,2),ysum(totRev,3)];
+  const mUy=[ysum(mktUplift,1),ysum(mktUplift,2),ysum(mktUplift,3)];
+  const cY=[ysum(costs,1),ysum(costs,2),ysum(costs,3)];
+  const nY=tRy.map((r,i)=>r-cY[i]);
+
+  /* ââ PAGE 1: REVENUE ââ */
+  setTxt('r-y1',fL(tRy[0]));setTxt('r-y2',fL(tRy[1]));setTxt('r-y3',fL(tRy[2]));
+  setTxt('r-cum',fL(tRy[0]+tRy[1]+tRy[2]));
+
+  setTxt('s1-y1',fS(s1y[0]));setTxt('s1-y2',fS(s1y[1]));setTxt('s1-y3',fS(s1y[2]));
+  setTxt('s1-cnt',soloActiveEndY1.toLocaleString());
+
+  setTxt('s2-y1',fS(s2y[0]));setTxt('s2-y2',fS(s2y[1]));setTxt('s2-y3',fS(s2y[2]));
+  setTxt('s3-y1',fS(s3y[0]));setTxt('s3-y2',fS(s3y[1]));setTxt('s3-y3',fS(s3y[2]));
+  setTxt('s4-y1',fS(s4y[0]));setTxt('s4-y2',fS(s4y[1]));setTxt('s4-y3',fS(s4y[2]));
+  setTxt('s5-y1',fS(s5y[0]));setTxt('s5-y2',fS(s5y[1]));setTxt('s5-y3',fS(s5y[2]));
+
+  mkBar('c-s1',labels,[
+    {label:'Sub',data:s1Sub,backgroundColor:'#E8A838aa',stack:'a'},
+    {label:'Txn',data:s1Txn,backgroundColor:'#E8A838',stack:'a'}
+  ],true,180);
+
+  mkBar('c-total36',labels,[
+    {label:'Solo',data:s1Total,backgroundColor:'#E8A838',stack:'a'},
+    {label:'RE',data:s2,backgroundColor:'#4A9EBF',stack:'a'},
+    {label:'INS',data:s3,backgroundColor:'#7FC47A',stack:'a'},
+    {label:'AU',data:s4,backgroundColor:'#B07FDD',stack:'a'},
+    {label:'WM',data:s5,backgroundColor:'#5BC4C0',stack:'a'},
+  ],true,220);
+
+  mkBar('c-annual',['Year 1','Year 2','Year 3'],[
+    {label:'Solo',data:s1y,backgroundColor:'#E8A838'},
+    {label:'RE',data:s2y,backgroundColor:'#4A9EBF'},
+    {label:'INS',data:s3y,backgroundColor:'#7FC47A'},
+    {label:'AU',data:s4y,backgroundColor:'#B07FDD'},
+    {label:'WM',data:s5y,backgroundColor:'#5BC4C0'},
+  ],false,200);
+
+  /* ââ PAGE 2: P&L ââ */
+  setTxt('p-y1r',fL(tRy[0]));setTxt('p-y2r',fL(tRy[1]));setTxt('p-y3r',fL(tRy[2]));
+  const y1p=nY[0],y3p=nY[2];
+  setTxt('p-y1p',(y1p>=0?'+':'')+fL(y1p));setCol('p-y1p',y1p>=0?'#34C759':'#FF3B30');
+  setTxt('p-y3p',(y3p>=0?'+':'')+fL(y3p));setCol('p-y3p',y3p>=0?'#34C759':'#FF3B30');
+  setTxt('pb-y1',(y1p>=0?'+':'')+fL(y1p));
+  setTxt('pb-y3',(y3p>=0?'+':'')+fL(y3p));
+  const pb1=document.getElementById('pb-y1'),pb3=document.getElementById('pb-y3');
+  if(pb1){pb1.style.color=y1p>=0?'#34C759':'#FF3B30';pb1.closest('.pb').className='pb '+(y1p>=0?'win':'loss');}
+  if(pb3){pb3.style.color=y3p>=0?'#34C759':'#FF3B30';pb3.closest('.pb').className='pb '+(y3p>=0?'win':'loss');}
+  let be=null;for(let i=0;i<36;i++){if(netProfit[i]>=0){be=i+1;break;}}
+  setTxt('p-be',be?'Month '+be:'>36mo');setTxt('pb-be',be?'M'+be:'>36');
+
+  mkBar('c-pnl',labels,[
+    {label:'Revenue',data:totRev,backgroundColor:'#FAB51588',stack:'a'},
+    {label:'Costs',data:costs.map(v=>-v),backgroundColor:'#FF3B3088',stack:'b'},
+    {label:'Net',data:netProfit,type:'line',borderColor:'#34C759',backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:.3,order:0}
+  ],false,220);
+
+  const costItemsFn=yr=>[
+    ['Hosting & infra',hostC[yr-1]*12],['Dev team',devC[yr-1]*12],
+    ['Founders draws',salC[yr-1]*12],['Marketing',mktC[yr-1]*12],
+    ['Legal',legC[yr-1]*12],
+    ['Txn processing',Math.round(ysum(s1Txn,yr)*txnF/100)],
+    ['Office & misc',miscC[yr-1]*12]
+  ];
+  function pnlBlock(elId,label,rev,costsTot,items){
+    const profit=rev-costsTot;
+    const pc=profit>=0?'#34C759':'#FF3B30';
+    let h=`<div style="font-size:10px;color:var(--gold);font-family:'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">${label}</div>`;
+    h+=`<table class="pnl-tbl"><tbody>`;
+    h+=`<tr class="hdr"><td class="lbl">Revenue</td><td class="val" style="color:#FAB515">${fS(rev)}</td></tr>`;
+    items.forEach(([l,v])=>{h+=`<tr><td class="lbl">${l}</td><td class="val" style="color:#FF3B30">-${fS(v)}</td></tr>`;});
+    h+=`<tr class="hdr"><td class="lbl">Total costs</td><td class="val">-${fS(costsTot)}</td></tr>`;
+    h+=`<tr class="sep"><td colspan="2"></td></tr>`;
+    h+=`<tr class="hdr"><td class="lbl">Net profit</td><td class="val" style="color:${pc}">${profit>=0?'+':''}${fS(profit)}</td></tr>`;
+    h+=`</tbody></table>`;
+    document.getElementById(elId).innerHTML=h;
+  }
+  pnlBlock('pnl-yr1','Year 1',tRy[0],cY[0],costItemsFn(1));
+  pnlBlock('pnl-yr2','Year 2',tRy[1],cY[1],costItemsFn(2));
+  pnlBlock('pnl-yr3','Year 3',tRy[2],cY[2],costItemsFn(3));
+
+  /* ââ PAGE 3: MARKETING ââ */
+  const base3=bry.reduce((a,b)=>a+b,0);
+  const with3=base3+mUy.reduce((a,b)=>a+b,0); // base + marketing uplift
+  const totalSpend3yr=(mktC[0]*12)+(mktC[1]*12)+(mktC[2]*12);
+  const totalMktRev3yr=mUy.reduce((a,b)=>a+b,0);
+  const roiStr=totalSpend3yr>0?(totalMktRev3yr/totalSpend3yr).toFixed(1)+'Ã':'â';
+
+  setTxt('mk-spend3yr',fL(totalSpend3yr));
+  setTxt('mk-rev3yr',fL(totalMktRev3yr));
+  setTxt('mk-roi3yr',roiStr);
+  setTxt('mk-base2',fL(base3));
+  setTxt('mk-with2',fL(with3));
+  setTxt('mk-up2','+'+fL(with3-base3));
+
+  // Scenario comparison: half / projected / double
+  const PROJ=[5000,12000,30000]; // locked projected amounts
+  function calcScenario(mults){
+    // mults = [y1_mo, y2_mo, y3_mo]
+    let total=0;
+    for(let yr=0;yr<3;yr++) total+=mults[yr]*12*em[yr];
+    return base3+total;
+  }
+  setTxt('mk-half',  fL(calcScenario([mktC[0]*0.5, mktC[1]*0.5, mktC[2]*0.5])));
+  setTxt('mk-proj',  fL(calcScenario(PROJ)));
+  setTxt('mk-dbl',   fL(calcScenario([mktC[0]*2,   mktC[1]*2,   mktC[2]*2])));
+
+  mkBar('c-elast',['Year 1','Year 2','Year 3'],[
+    {label:'Base',data:bry,backgroundColor:'#E8A838aa'},
+    {label:'Uplift',data:mUy,backgroundColor:'#FAB51599'},
+  ],false,220);
+
+  mkBar('c-mktg-mo',labels,[
+    {label:'Spend',data:labels.map((_,i)=>{const yr=i<12?1:i<24?2:3;return mktC[yr-1];}),backgroundColor:'#FF3B3077'},
+    {label:'Generated',data:mktUplift,backgroundColor:'#FAB51588'},
+  ],false,220);
+
+  const perMoY1=mktC[0]>0?(mktC[0]*em[0]).toLocaleString():'0';
+  setTxt('n-mktg',
+    `Projected spend: $${mktC[0].toLocaleString()}/mo (Y1) Â· $${mktC[1].toLocaleString()}/mo (Y2) Â· $${mktC[2].toLocaleString()}/mo (Y3) Â· `+
+    `3yr total spend: ${fL(totalSpend3yr)} Â· Revenue from spend: ${fL(totalMktRev3yr)} Â· Return: ${roiStr} Â· `+
+    `At $${mktC[0].toLocaleString()}/mo in Y1 with ${em[0]}Ã ROI â $${perMoY1}/mo in extra revenue Â· `+
+    `Industry benchmark for early-stage B2B SaaS: 2â5Ã marketing ROI`
+  );
+
+  /* ââ GRAND BANNER ââ */
+  // Summary bar updates handled by r-y1/y2/y3 IDs on Revenue page
+
+  updateSAM(s1Total,s2,s3,s4,s5,labels);
+}
+
+/* ââ SAM PENETRATION MODEL ââ */
+const SAM_SIZE={sb:200000,re:15000,ins:3850,sp:13500,dl:775,wm:4000};
+
+function updateSAM(s1Total,s2,s3,s4,s5,labels){
+  const pSb=[gv('pct-sb1'),gv('pct-sb2'),gv('pct-sb3')];
+  const pRe=[gv('pct-re1'),gv('pct-re2'),gv('pct-re3')];
+  const pIns=[gv('pct-ins1'),gv('pct-ins2'),gv('pct-ins3')];
+  const pSp=[gv('pct-sp1'),gv('pct-sp2'),gv('pct-sp3')];
+  const pDl=[gv('pct-dl1'),gv('pct-dl2'),gv('pct-dl3')];
+  const pWm=[gv('pct-wm1'),gv('pct-wm2'),gv('pct-wm3')];
+
+  // Update % labels
+  [['pct-sb1','l-pct-sb1'],['pct-sb2','l-pct-sb2'],['pct-sb3','l-pct-sb3'],
+   ['pct-re1','l-pct-re1'],['pct-re2','l-pct-re2'],['pct-re3','l-pct-re3'],
+   ['pct-ins1','l-pct-ins1'],['pct-ins2','l-pct-ins2'],['pct-ins3','l-pct-ins3'],
+   ['pct-sp1','l-pct-sp1'],['pct-sp2','l-pct-sp2'],['pct-sp3','l-pct-sp3'],
+   ['pct-dl1','l-pct-dl1'],['pct-dl2','l-pct-dl2'],['pct-dl3','l-pct-dl3'],
+   ['pct-wm1','l-pct-wm1'],['pct-wm2','l-pct-wm2'],['pct-wm3','l-pct-wm3'],
+  ].forEach(([i,o])=>setTxt(o,parseFloat(document.getElementById(i).value).toFixed(2)+'%'));
+
+  // Derive account counts
+  const sbB=pSb.map(p=>Math.round(SAM_SIZE.sb*p/100));
+  const reB=pRe.map(p=>Math.round(SAM_SIZE.re*p/100));
+  const insB=pIns.map(p=>Math.round(SAM_SIZE.ins*p/100));
+  const spB=pSp.map(p=>Math.round(SAM_SIZE.sp*p/100));
+  const dlB=pDl.map(p=>Math.round(SAM_SIZE.dl*p/100));
+  const wmB=pWm.map(p=>Math.round(SAM_SIZE.wm*p/100));
+
+  setTxt('pct-sb-cnt1',sbB[0].toLocaleString());setTxt('pct-sb-cnt3',sbB[2].toLocaleString());
+  setTxt('pct-re-cnt1',reB[0].toLocaleString());setTxt('pct-re-cnt3',reB[2].toLocaleString());
+  setTxt('pct-ins-cnt1',insB[0].toLocaleString());setTxt('pct-ins-cnt3',insB[2].toLocaleString());
+  setTxt('pct-sp-cnt1',spB[0].toLocaleString());setTxt('pct-sp-cnt3',spB[2].toLocaleString());
+  setTxt('pct-dl-cnt1',dlB[0].toLocaleString());setTxt('pct-dl-cnt3',dlB[2].toLocaleString());
+  setTxt('pct-wm-cnt1',wmB[0].toLocaleString());setTxt('pct-wm-cnt3',wmB[2].toLocaleString());
+
+  // Use new GTM logic for solo, linear ramp for verticals
+  const jv=gv('jv'),jm=gv('jm');
+  const churnArr=[gv('ch1'),gv('ch2'),gv('ch3')];
+  const txnPctEnd=[gv('txna'),gv('txnb'),gv('txnc')];
+
+  // For SAM view: solo driven by % penetration as target paying count, using ramp
+  const samS1=[],samS2=[],samS3=[],samS4=[],samS5=[];
+  for(let m=1;m<=36;m++){
+    const yr=m<=12?1:m<=24?2:3;
+    const miy=m<=12?m:m<=24?m-12:m-24;
+    const prev=yr===1?0:sbB[yr-2];
+    const curr=sbB[yr-1];
+    const targetPaying=Math.round(prev+(miy/12)*(curr-prev));
+    const miyFrac=miy/12;
+    const txnStart=yr===1?20:(yr===2?55:68);
+    const txnEnd=txnPctEnd[yr-1];
+    const txnPct=(txnStart+(txnEnd-txnStart)*Math.min(1,miy/12))/100;
+    const subRev=targetPaying*25;
+    const txnRev=Math.round(targetPaying*txnPct*jm*jv*0.07);
+    samS1.push(subRev+txnRev);
+
+    // Verticals â linear ramp from % targets
+    const rePrev=yr===1?0:reB[yr-2];const reCurr=reB[yr-1];
+    samS2.push(m<7?0:Math.round((rePrev+(miy/12)*(reCurr-rePrev))*199));
+    const insPrev=yr===1?0:insB[yr-2];const insCurr=insB[yr-1];
+    samS3.push(m<7?0:Math.round((insPrev+(miy/12)*(insCurr-insPrev))*199));
+  2 const spPrev=yr===1?0:spB[yr-2];const spCurr=spB[yr-1];
+    const dlPrev=yr===1?0:dlB[yr-2];const dlCurr=dlB[yr-1];
+    samS4.push(m<7?0:Math.round((spPrev+(miy/12)*(spCurr-spPrev))*49+(dlPrev+(miy/12)*(dlCurr-dlPrev))*500));
+    const wmPrev=yr===1?0:wmB[yr-2];const wmCurr=wmB[yr-1];
+    samS5.push(m<7?0:Math.round((wmPrev+(miy/12)*(wmCurr-wmPrev))*199));
+  }
+
+  const samTot=samS1.map((v,i)=>v+samS2[i]+samS3[i]+samS4[i]+samS5[i]);
+  const y1=ysum(samTot,1),y2=ysum(samTot,2),y3=ysum(samTot,3);
+
+  setTxt('pct-sb-rev3',fS(ysum(samS1,3)));
+  setTxt('pct-re-rev3',fS(ysum(samS2,3)));
+  setTxt('pct-ins-rev3',fS(ysum(samS3,3)));
+  setTxt('pct-sp-rev3',fS(ysum(samS4,3)));
+  setTxt('pct-dl-rev3',fS(ysum(samS4,3)));
+  setTxt('pct-wm-rev3',fS(ysum(samS5,3)));
+
+  setTxt('sam-y1',fL(y1));setTxt('sam-y3',fL(y3));setTxt('sam-cum',fL(y1+y2+y3));
+
+  setTxt('n-sam',
+    `Solo: ${sbB[0].toLocaleString()}â${sbB[2].toLocaleString()} accounts (${pSb[0]}%â${pSb[2]}% of ${SAM_SIZE.sb.toLocaleString()}) Â· RE seats: ${reB[0]}â${reB[2]} (${pRe[0]}%â${pRe[2]}% of ${SAM_SIZE.re.toLocaleString()}) Â· Insurance: ${insB[0]}â${insB[2]} (${pIns[0]}%â${pIns[2]}%) Â· Auto SP: ${spB[0]}â${spB[2]} Â· Dealerships: ${dlB[0]}â${dlB[2]} Â· WM: ${wmB[0]}â${wmB[2]} (${pWm[0]}%â${pWm[2]}%) Â· Transaction fee: 7% platform on completed jobs`
+  );
+
+  mkBar('c-sam36',labels,[
+    {label:'Solo',data:samS1,backgroundColor:'#E8A838',stack:'a'},
+    {label:'RE',data:samS2,backgroundColor:'#4A9EBF',stack:'a'},
+    {label:'INS',data:samS3,backgroundColor:'#7FC47A',stack:'a'},
+    {label:'AU',data:samS4,backgroundColor:'#B07FDD',stack:'a'},
+    {label:'WM',data:samS5,backgroundColor:'#5BC4C0',stack:'a'},
+  ],true,220);
+}
+
+// Sync P&L â Marketing spend sliders â one source of truth
+function syncMktSliders(source){
+  if(source==='pnl'){
+    document.getElementById('mk-m1').value=document.getElementById('m1').value;
+    document.getElementById('mk-m2').value=document.getElementById('m2').value;
+    document.getElementById('mk-m3').value=document.getElementById('m3').value;
+  } else {
+    document.getElementById('m1').value=document.getElementById('mk-m1').value;
+    document.getElementById('m2').value=document.getElementById('mk-m2').value;
+    document.getElementById('m3').value=document.getElementById('mk-m3').value;
+  }
+}
+
+document.querySelectorAll('input[type=range]').forEach(el=>el.addEventListener('input',()=>{
+  if(el.id==='m1'||el.id==='m2'||el.id==='m3') syncMktSliders('pnl');
+  if(el.id==='mk-m1'||el.id==='mk-m2'||el.id==='mk-m3') syncMktSliders('mktg');
+  update();
+}));
+
+function setTopbarHeight(){
+  const h=document.querySelector('.topbar').offsetHeight;
+  document.documentElement.style.setProperty('--topbar-h',h+'px');
+}
+
+// All default values â matches locked GTM model
+const DEFAULTS={
+  // GTM â locked model: Y1=$161K Y2=$820K Y3=$3.55M
+  'stu1':10,'stu2':20,'stu3':50,
+  'conv-bd':10,'conv':8,
+  'ch1':15,'ch2':7,'ch3':4,
+  'jv':200,'jm':4,
+  'txna':55,'txnb':75,'txnc':80,
+  // Verticals â defaults produce exactly 25/165/960 total equiv seats
+  // Y1: 1 RE brokerage Ã 25 = 25 seats
+  'reb1':1,'reb2':5,'reb3':23,'reaps':25,
+  // INS: 0/2/10 brokerages Ã 15 = 0/30/150 seats
+  'insb1':0,'insb2':2,'insb3':10,'insaps':15,
+  // Auto SP/DL: 0 Y1, 0 Y2, scale Y3 â (200Ã49+30Ã500)/199=125 equiv seats Y3
+  'sp1':0,'sp2':0,'sp3':200,'dl1':0,'dl2':0,'dl3':30,
+  // WM: 0/1/11 firms Ã 10 seats/firm = 0/10/110 seats
+  'wmb1':0,'wmb2':1,'wmb3':11,'wmaps':10,
+  // Costs
+  'h1':500,'h2':1000,'h3':2000,
+  'd1':5000,'d2':5000,'d3':5000,
+  'f1':0,'f2':3000,'f3':8000,
+  'm1':5000,'m2':12000,'m3':30000,
+  'mk-m1':5000,'mk-m2':12000,'mk-m3':30000,
+  'lg1':500,'lg2':500,'lg3':1000,
+  'tf':2.9,'ms1':300,'ms2':500,'ms3':1000,
+  'em1':2,'em2':3,'em3':4,
+  // SAM defaults
+  'pct-sb1':0.04,'pct-sb2':0.15,'pct-sb3':0.40,
+  'pct-re1':0.13,'pct-re2':0.53,'pct-re3':1.33,
+  'pct-ins1':0.26,'pct-ins2':1.03,'pct-ins3':2.56,
+  'pct-sp1':0.15,'pct-sp2':0.59,'pct-sp3':1.48,
+  'pct-dl1':0.65,'pct-dl2':2.55,'pct-dl3':6.37,
+  'pct-wm1':0.25,'pct-wm2':1.00,'pct-wm3':3.00,
+};
+
+function resetAll(){
+  Object.entries(DEFAULTS).forEach(([id,val])=>{
+    const el=document.getElementById(id);
+    if(el) el.value=val;
+  });
+  update();
+  // Brief flash on the reset button to confirm
+  const btn=event.currentTarget;
+  btn.style.background='rgba(250,181,21,.2)';
+  btn.style.color='var(--gold)';
+  setTimeout(()=>{btn.style.background='rgba(255,255,255,.08)';btn.style.color='var(--muted)';},600);
+}
+setTopbarHeight();
+window.addEventListener('resize',setTopbarHeight);
+
+update();
+</script>
+</body>
+</html>
