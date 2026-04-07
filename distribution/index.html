@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Servitium â Investor & Judge Overview</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --maroon: #880808;
+  --maroon-deep: #5c0505;
+  --maroon-light: #b31010;
+  --gold: #C9A84C;
+  --gold-light: #e8c97a;
+  --gold-pale: #f5ead0;
+  --white: #ffffff;
+  --off-white: #faf8f5;
+  --cream: #f2ede4;
+  --ink: #1a1008;
+  --ink-mid: #3d2f1f;
+  --ink-light: #7a6a58;
+  --border: rgba(201,168,76,0.25);
+  --border-strong: rgba(201,168,76,0.5);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--off-white);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ââ NAV âââââââââââââââââââââââââââââââââââââââââââââââââââ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: var(--maroon);
+  border-bottom: 1px solid rgba(201,168,76,0.3);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px; height: 60px;
+}
+.nav-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px; font-weight: 600; color: var(--white);
+  letter-spacing: 0.03em;
+  display: flex; align-items: center; gap: 10px;
+}
+.nav-brand span {
+  color: var(--gold); font-size: 11px; font-family: 'DM Sans', sans-serif;
+  font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 2px 8px; border: 1px solid rgba(201,168,76,0.4); border-radius: 2px;
+}
+.nav-links { display: flex; gap: 4px; }
+.nav-btn {
+  padding: 7px 20px; border-radius: 3px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  font-weight: 500; letter-spacing: 0.04em;
+  border: 1px solid transparent; transition: all 0.2s;
+  text-transform: uppercase;
+}
+.nav-btn.active {
+  background: var(--gold); color: var(--maroon-deep);
+  border-color: var(--gold);
+}
+.nav-btn:not(.active) {
+  background: transparent; color: rgba(255,255,255,0.7);
+  border-color: rgba(255,255,255,0.15);
+}
+.nav-btn:not(.active):hover {
+  color: var(--white); border-color: rgba(255,255,255,0.4);
+}
+
+/* ââ PAGES âââââââââââââââââââââââââââââââââââââââââââââââââ */
+.page { display: none; padding-top: 60px; min-height: 100vh; }
+.page.active { display: block; }
+
+/* ââ HERO âââââââââââââââââââââââââââââââââââââââââââââââââââ */
+.hero {
+  background: linear-gradient(135deg, var(--maroon-deep) 0%, var(--maroon) 50%, #a01010 100%);
+  padding: 72px 40px 64px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: -80px; right: -80px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.hero::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.hero-inner { max-width: 960px; margin: 0 auto; }
+.hero-eyebrow {
+  font-family: 'DM Sans', sans-serif; font-size: 11px;
+  font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 16px;
+}
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 5vw, 52px); font-weight: 600;
+  color: var(--white); line-height: 1.15; margin-bottom: 16px;
+}
+.hero-title em { color: var(--gold); font-style: normal; }
+.hero-sub {
+  color: rgba(255,255,255,0.72); font-size: 15px;
+  max-width: 560px; line-height: 1.7;
+}
+.hero-stats {
+  display: flex; gap: 32px; margin-top: 40px; flex-wrap: wrap;
+}
+.hero-stat { border-left: 2px solid var(--gold); padding-left: 16px; }
+.hero-stat-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px; font-weight: 700; color: var(--white); line-height: 1;
+}
+.hero-stat-lbl {
+  font-size: 11px; color: rgba(255,255,255,0.55);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px;
+}
+
+/* ââ CONTENT WRAPPER âââââââââââââââââââââââââââââââââââââââ */
+.content { max-width: 960px; margin: 0 auto; padding: 56px 40px; }
+
+/* ââ SECTION TITLES ââââââââââââââââââââââââââââââââââââââââ */
+.section-eyebrow {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 6px;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px; font-weight: 600; color: var(--maroon);
+  margin-bottom: 24px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ââ CARDS & BOXES âââââââââââââââââââââââââââââââââââââââââ */
+.card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 6px; padding: 24px 28px;
+}
+.card-gold {
+  background: linear-gradient(135deg, #fffbf0 0%, #fdf5dc 100%);
+  border: 1px solid var(--border-strong); border-radius: 6px; padding: 24px 28px;
+}
+
+/* ââ METRIC GRID âââââââââââââââââââââââââââââââââââââââââââ */
+.metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 16px; margin: 24px 0; }
+.metric-box {
+  background: var(--white); border: 1px solid var(--border);
+  border-top: 3px solid var(--maroon); border-radius: 4px;
+  padding: 20px 20px 16px;
+}
+.metric-box.gold { border-top-color: var(--gold); }
+.metric-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 6px; }
+.metric-value { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 700; color: var(--maroon); line-height: 1; }
+.metric-value.gold { color: var(--gold); }
+.metric-sub { font-size: 12px; color: var(--ink-light); margin-top: 4px; line-height: 1.5; }
+
+/* ââ PHASE TIMELINE ââââââââââââââââââââââââââââââââââââââââ */
+.timeline { position: relative; padding-left: 32px; }
+.timeline::before {
+  content: ''; position: absolute; left: 8px; top: 8px; bottom: 8px;
+  width: 2px; background: linear-gradient(to bottom, var(--maroon), var(--gold));
+}
+.timeline-item { position: relative; margin-bottom: 32px; }
+.timeline-item:last-child { margin-bottom: 0; }
+.timeline-dot {
+  position: absolute; left: -28px; top: 6px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--maroon); border: 2px solid var(--gold);
+  z-index: 1;
+}
+.timeline-item.active .timeline-dot { background: var(--gold); }
+.timeline-phase {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 4px;
+}
+.timeline-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; font-weight: 600; color: var(--maroon); margin-bottom: 8px;
+}
+.timeline-body { font-size: 14px; color: var(--ink-mid); line-height: 1.7; }
+.timeline-target {
+  display: inline-block; margin-top: 10px; padding: 4px 12px;
+  background: var(--cream); border: 1px solid var(--border);
+  border-radius: 3px; font-size: 12px; color: var(--ink-mid);
+}
+
+/* ââ TWO COL âââââââââââââââââââââââââââââââââââââââââââââââ */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+@media(max-width:700px) { .two-col, .three-col { grid-template-columns: 1fr; } }
+
+/* ââ DATA TABLE ââââââââââââââââââââââââââââââââââââââââââââ */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 16px 0; }
+.data-table th {
+  background: var(--maroon); color: var(--white);
+  padding: 10px 14px; text-align: left; font-weight: 500;
+  font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.data-table th:first-child { border-radius: 4px 0 0 0; }
+.data-table th:last-child  { border-radius: 0 4px 0 0; }
+.data-table td { padding: 9px 14px; border-bottom: 1px solid var(--cream); }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr.total td { background: var(--gold-pale); font-weight: 600; color: var(--maroon); border-top: 2px solid var(--gold); }
+.data-table tr:hover td { background: #fdf9f0; }
+.data-table .num { text-align: right; font-variant-numeric: tabular-nums; color: var(--maroon); font-weight: 500; }
+.data-table .label { color: var(--ink-mid); }
+
+/* ââ ASSUMPTION ROWS âââââââââââââââââââââââââââââââââââââââ */
+.assumption-list { list-style: none; }
+.assumption-list li {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 14px 0; border-bottom: 1px solid var(--cream);
+  font-size: 13.5px;
+}
+.assumption-list li:last-child { border-bottom: none; }
+.assumption-list .a-label { flex: 0 0 220px; font-weight: 500; color: var(--maroon); font-size: 13px; }
+.assumption-list .a-val { flex: 1; color: var(--ink-mid); }
+
+/* ââ YEAR TABS âââââââââââââââââââââââââââââââââââââââââââââ */
+.year-tabs { display: flex; gap: 4px; margin-bottom: 24px; }
+.year-tab {
+  padding: 8px 22px; border: 1px solid var(--border);
+  border-radius: 3px; cursor: pointer; font-size: 13px;
+  font-weight: 500; font-family: 'DM Sans', sans-serif;
+  transition: all 0.18s; background: var(--white); color: var(--ink-light);
+}
+.year-tab.active { background: var(--maroon); color: var(--white); border-color: var(--maroon); }
+.year-tab:not(.active):hover { border-color: var(--gold); color: var(--ink); }
+.year-content { display: none; }
+.year-content.active { display: block; }
+
+/* ââ CHART CONTAINER âââââââââââââââââââââââââââââââââââââââ */
+.chart-wrap {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 6px; padding: 24px; margin: 24px 0;
+}
+.chart-wrap canvas { max-height: 300px; }
+
+/* ââ COST BAND âââââââââââââââââââââââââââââââââââââââââââââ */
+.cost-band {
+  display: flex; gap: 0; border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden; margin: 16px 0;
+}
+.cost-item { flex: 1; padding: 16px 14px; text-align: center; border-right: 1px solid var(--border); }
+.cost-item:last-child { border-right: none; }
+.cost-item-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-light); margin-bottom: 4px; }
+.cost-item-value { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: var(--maroon); }
+.cost-item-sub { font-size: 11px; color: var(--ink-light); margin-top: 2px; }
+
+/* ââ RISK TABLE ââââââââââââââââââââââââââââââââââââââââââââ */
+.pill {
+  display: inline-block; padding: 2px 9px; border-radius: 10px;
+  font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.pill-low  { background: #e8f5e9; color: #2e7d32; }
+.pill-med  { background: #fff3e0; color: #e65100; }
+.pill-high { background: #fce4ec; color: #c62828; }
+
+/* ââ DIVIDER âââââââââââââââââââââââââââââââââââââââââââââââ */
+.divider {
+  height: 1px; margin: 48px 0;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+/* ââ ALLIANCE CARD âââââââââââââââââââââââââââââââââââââââââ */
+.alliance-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 14px; margin: 20px 0; }
+.alliance-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-left: 3px solid var(--gold); border-radius: 0 4px 4px 0;
+  padding: 16px 18px;
+}
+.alliance-card .a-type { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+.alliance-card .a-name { font-size: 15px; font-weight: 500; color: var(--ink); margin-bottom: 3px; }
+.alliance-card .a-detail { font-size: 12px; color: var(--ink-light); }
+
+/* ââ FOOTER ââââââââââââââââââââââââââââââââââââââââââââââââ */
+footer {
+  background: var(--maroon-deep); color: rgba(255,255,255,0.5);
+  text-align: center; padding: 24px; font-size: 12px;
+  border-top: 1px solid rgba(201,168,76,0.2);
+  letter-spacing: 0.04em;
+}
+
+/* ââ ANIMATIONS ââââââââââââââââââââââââââââââââââââââââââââ */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.fade-up { animation: fadeUp 0.5s ease both; }
+.fade-up-1 { animation-delay: 0.05s; }
+.fade-up-2 { animation-delay: 0.12s; }
+.fade-up-3 { animation-delay: 0.20s; }
+.fade-up-4 { animation-delay: 0.28s; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    Servitium <span>NVBC 2026</span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showPage('distribution',this)">Distribution Plan</button>
+    <button class="nav-btn" onclick="showPage('financial',this)">Financial Model</button>
+  </div>
+</nav>
+
+<!-- âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
+<!-- PAGE 1 â DISTRIBUTION -->
+<!-- âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
+<div id="page-distribution" class="page active">
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow fade-up">Distribution Strategy</div>
+      <h1 class="hero-title fade-up fade-up-1">Supply first.<br>Demand follows.<em> Flywheel compounds.</em></h1>
+      <p class="hero-sub fade-up fade-up-2">Servitium onboards businesses before marketing to consumers. Investment closes â soft launch begins. Year 1 revenue clock starts on launch day.</p>
+      <div class="hero-stats fade-up fade-up-3">
+        <div class="hero-stat">
+          <div class="hero-stat-val">55</div>
+          <div class="hero-stat-lbl">Businesses/month (Year 1)</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">10</div>
+          <div class="hero-stat-lbl">Student brand ambassadors</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">$22/hr</div>
+          <div class="hero-stat-lbl">Student wage (co-op)</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">8%</div>
+          <div class="hero-stat-lbl">Warm D2D conversion</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- THE MODEL -->
+    <div class="section-eyebrow">The Core Logic</div>
+    <h2 class="section-title">How the supply engine works</h2>
+
+    <div class="two-col" style="margin-bottom:32px;">
+      <div class="card">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">The Threshold Rule</div>
+        <p style="font-size:14px;color:var(--ink-mid);">Consumer marketing activates <strong>only once 10 businesses</strong> in a service category are active in Metro Vancouver. Not before. This prevents spending consumer acquisition budget before supply density exists.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">BILS Cross-Marketing</div>
+        <p style="font-size:14px;color:var(--ink-mid);">Every onboarded business receives a BILS card â a shareable OpenGraph-enabled profile link. Each business has ~150 contacts. At 5% click-through = <strong>7.5 consumer touchpoints</strong> per business from Day 1 at zero cost.</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- TEAM STRUCTURE -->
+    <div class="section-eyebrow">Team Structure</div>
+    <h2 class="section-title">Who executes the strategy</h2>
+
+    <div class="three-col" style="margin-bottom:32px;">
+      <div class="card">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--maroon);margin-bottom:8px;">Senior BD Hire</div>
+        <p style="font-size:13.5px;color:var(--ink-mid);">Trains and accompanies students <strong>Months 1â2</strong>. Students independent from Month 3. BD fully pivots to brokerage LOI pipeline from <strong>Month 7</strong> onward. ~$70K/year base.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--maroon);margin-bottom:8px;">10 Students Â· Servitium</div>
+        <p style="font-size:13.5px;color:var(--ink-mid);">Recruited via Metro Vancouver university co-op programs. $22/hr Â· 10hrs/week. Each manages their own branded social account. Visits businesses, films short-form video, hands raw footage to agency.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--maroon);margin-bottom:8px;">Vancouver Content Agency</div>
+        <p style="font-size:13.5px;color:var(--ink-mid);">Edits raw student footage, schedules posts across 10 accounts, boosts top-performing content. <strong>$1,500/month</strong>. Students do not post â the agency handles everything after filming.</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- PHASED GTM -->
+    <div class="section-eyebrow">Go-to-Market Phases</div>
+    <h2 class="section-title">Phased expansion plan</h2>
+
+    <div class="timeline">
+      <div class="timeline-item active">
+        <div class="timeline-dot"></div>
+        <div class="timeline-phase">Phase 1 Â· Months 1â6</div>
+        <div class="timeline-heading">Metro Vancouver â Supply Build</div>
+        <div class="timeline-body">BD trains 10 students. Students conduct 20 in-person business visits per week each (800 total/month). BD accompanies Months 1â2, students independent from Month 3. <strong>No vertical onboarding</strong> â vertical modules in development. Vancouver agency posts one business feature video per onboarded business.</div>
+        <div class="timeline-target">Target: ~255 paying businesses by Month 6 Â· Zero vertical revenue</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-phase">Phase 2 Â· Months 7â12</div>
+        <div class="timeline-heading">Metro Vancouver â Vertical Launch</div>
+        <div class="timeline-body">BD pivots to brokerage LOI pipeline. One founding partner LOI per vertical (real estate, insurance, wealth management) used as credibility anchor. BD approaches additional brokerages using founding partner endorsement. Consumer paid ads activate category-by-category. Vancouver freelancer manages Meta + Google LSA ($3,500/month).</div>
+        <div class="timeline-target">Target: First brokerage agents paying Month 8 Â· 362 solo businesses by Month 12</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-phase">Phase 3 Â· Year 2</div>
+        <div class="timeline-heading">BC + Alberta Expansion</div>
+        <div class="timeline-body">Student model replicated in Calgary and Edmonton (5 students + 1 BD hire per city). Metro Vancouver cohort renewed. 3 BD hires total. BD closes 1 brokerage every 6 weeks â 8 brokerages by Year 2 end. Churn improves 15% â 7% as platform value compounds.</div>
+        <div class="timeline-target">Target: 1,058 paying businesses Â· 160 agent seats Â· ~$100K MRR</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-phase">Phase 4 Â· Year 3</div>
+        <div class="timeline-heading">Canada-Wide</div>
+        <div class="timeline-body">Five cities operational: Vancouver, Calgary, Edmonton, Toronto, Montreal/Ottawa. 50 students, 5 BD hires. 40 new brokerages closed across Year 3. Churn drops to 4%. Transaction fees become the dominant revenue stream as consumer volume compounds across all cities.</div>
+        <div class="timeline-target">Target: 3,539 paying businesses Â· 960 agent seats Â· ~$428K MRR</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ALLIANCES -->
+    <div class="section-eyebrow">Alliance Strategy</div>
+    <h2 class="section-title">Founding partner model â one per vertical</h2>
+
+    <div class="alliance-row">
+      <div class="alliance-card">
+        <div class="a-type">Real Estate Â· Seeking Founding Partner</div>
+        <div class="a-name">Top-producing Metro Vancouver REALTOR</div>
+        <div class="a-detail">Active conversation underway Â· Sutton Group network Â· Top 1% designation Â· LOI in progress</div>
+      </div>
+      <div class="alliance-card">
+        <div class="a-type">Wealth Management Â· Seeking Founding Partner</div>
+        <div class="a-name">Metro Vancouver Advisory Firm</div>
+        <div class="a-detail">Active conversation underway Â· Independent wealth management firm Â· Managing Director level Â· LOI in progress</div>
+      </div>
+      <div class="alliance-card">
+        <div class="a-type">Insurance Â· Seeking Founding Partner</div>
+        <div class="a-name">BC Insurance Brokerage</div>
+        <div class="a-detail">Active conversation underway Â· Licensed P&amp;C brokerage Â· Metro Vancouver Â· LOI in progress</div>
+      </div>
+      <div class="alliance-card">
+        <div class="a-type">Industry Â· In Progress</div>
+        <div class="a-name">BC Industry Associations</div>
+        <div class="a-detail">BCLNA Â· Delta Chamber of Commerce Â· Surrey Immigrant Entrepreneur Networks</div>
+      </div>
+    </div>
+
+    <p style="font-size:13px;color:var(--ink-light);margin-top:8px;">One founding partner LOI per vertical â used as a credibility anchor. After signing, the BD hire uses that endorsement to approach additional brokerages in the same vertical without requiring a separate LOI for each. Founding partners receive permanent status, free onboarding, and early feature co-design access.</p>
+
+    <div class="divider"></div>
+
+    <!-- VALUE CHAIN -->
+    <div class="section-eyebrow">Industry Value Chain</div>
+    <h2 class="section-title">How value flows through the platform</h2>
+
+    <div class="two-col">
+      <div class="card">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--maroon);margin-bottom:12px;">Solo Home Services</div>
+        <div style="font-size:13px;color:var(--ink-mid);line-height:2;">
+          Consumer discovers via Servitium profile or BILS link<br>
+          â Views verified 10-star score and portfolio<br>
+          â Submits quote request via Hub<br>
+          â Professional quotes in-app<br>
+          â Schedule confirmed<br>
+          â Job start approved by both parties<br>
+          â Job completed<br>
+          â Payment released via Stripe<br>
+          â Verified review posted automatically
+        </div>
+        <div style="margin-top:14px;padding:10px 14px;background:var(--cream);border-radius:4px;font-size:12px;color:var(--maroon);font-weight:500;">Servitium earns: $25/month + 7% on completed transactions</div>
+      </div>
+      <div class="card">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--maroon);margin-bottom:12px;">Vertical Professionals</div>
+        <div style="font-size:13px;color:var(--ink-mid);line-height:2;">
+          Consumer submits inquiry via Hub<br>
+          â Professional responds<br>
+          â Needs assessment scheduled<br>
+          â Quote prepared<br>
+          â Quote presented<br>
+          â Policy placed / transaction closed<br>
+          â Consumers pay nothing
+        </div>
+        <div style="margin-top:14px;padding:10px 14px;background:var(--cream);border-radius:4px;font-size:12px;color:var(--maroon);font-weight:500;">Servitium earns: $199/month per agent seat (pure subscription)</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
+<!-- PAGE 2 â FINANCIAL -->
+<!-- âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
+<div id="page-financial" class="page">
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow fade-up">Financial Model</div>
+      <h1 class="hero-title fade-up fade-up-1">Bottom-up.<br><em>Benchmark-backed.</em> Conservative.</h1>
+      <p class="hero-sub fade-up fade-up-2">Every number is derived from confirmed inputs â student visit rates, D2D conversion benchmarks, and SaaS churn data. No projections are assumed without a source.</p>
+      <div class="hero-stats fade-up fade-up-3">
+        <div class="hero-stat">
+          <div class="hero-stat-val">$161K</div>
+          <div class="hero-stat-lbl">Year 1 Revenue</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">$820K</div>
+          <div class="hero-stat-lbl">Year 2 Revenue</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">$3.55M</div>
+          <div class="hero-stat-lbl">Year 3 Revenue</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">Month 8</div>
+          <div class="hero-stat-lbl">Cash-flow positive trigger</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- REVENUE MODEL -->
+    <div class="section-eyebrow">Revenue Streams</div>
+    <h2 class="section-title">Three streams, two customer types</h2>
+
+    <div class="three-col" style="margin-bottom:32px;">
+      <div class="card-gold">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Stream 1</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--maroon);">$25 / month</div>
+        <div style="font-size:13px;color:var(--ink-mid);margin-top:6px;">Solo business subscription. First month free. No contract. Activates the month after onboarding.</div>
+      </div>
+      <div class="card-gold">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Stream 2</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--maroon);">7% per job</div>
+        <div style="font-size:13px;color:var(--ink-mid);margin-top:6px;">Platform transaction fee on completed, paid jobs only. No completed job = no fee. Stripe adds 3% = 10% gross.</div>
+      </div>
+      <div class="card-gold">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Stream 3</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--maroon);">$199 / seat</div>
+        <div style="font-size:13px;color:var(--ink-mid);margin-top:6px;">Vertical agent seat: real estate, insurance, wealth management. $49/month auto salesperson. Pure recurring subscription.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- COST STRUCTURE -->
+    <div class="section-eyebrow">Cost Structure</div>
+    <h2 class="section-title">What the seed round funds</h2>
+
+    <div class="cost-band">
+      <div class="cost-item">
+        <div class="cost-item-label">Months 1â6 Burn</div>
+        <div class="cost-item-value">$22.8K</div>
+        <div class="cost-item-sub">per month</div>
+      </div>
+      <div class="cost-item">
+        <div class="cost-item-label">Months 7â12 Burn</div>
+        <div class="cost-item-value">$26.3K</div>
+        <div class="cost-item-sub">per month (ads activate)</div>
+      </div>
+      <div class="cost-item">
+        <div class="cost-item-label">Year 2 Burn</div>
+        <div class="cost-item-value">$53.4K</div>
+        <div class="cost-item-sub">per month (3 cities)</div>
+      </div>
+      <div class="cost-item">
+        <div class="cost-item-label">Current Burn</div>
+        <div class="cost-item-value">$1K</div>
+        <div class="cost-item-sub">per month (pre-launch)</div>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead><tr>
+        <th>Cost Item</th><th>Months 1â6</th><th>Months 7â12</th><th>Year 2+</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="label">BD hire (1 â 3 by Year 2)</td><td class="num">$5,833/mo</td><td class="num">$5,833/mo</td><td class="num">$17,499/mo</td></tr>
+        <tr><td class="label">Student team (10 â 20 â 50)</td><td class="num">$9,460/mo</td><td class="num">$9,460/mo</td><td class="num">$18,920/mo</td></tr>
+        <tr><td class="label">Vancouver content agency</td><td class="num">$1,500/mo</td><td class="num">$1,500/mo</td><td class="num">$3,000/mo</td></tr>
+        <tr><td class="label">Consumer paid ads + management</td><td class="num">$0 (activates M7)</td><td class="num">$3,500/mo</td><td class="num">$7,000/mo</td></tr>
+        <tr><td class="label">Dev team</td><td class="num">$5,000/mo</td><td class="num">$5,000/mo</td><td class="num">$5,000/mo</td></tr>
+        <tr><td class="label">Infrastructure + legal + admin</td><td class="num">$1,000/mo</td><td class="num">$1,000/mo</td><td class="num">$2,000/mo</td></tr>
+        <tr class="total"><td>Total Monthly Burn</td><td class="num">~$22,793</td><td class="num">~$26,293</td><td class="num">~$53,419</td></tr>
+      </tbody>
+    </table>
+
+    <div class="divider"></div>
+
+    <!-- YEAR TABS + PROJECTIONS -->
+    <div class="section-eyebrow">Bottom-Up Projections</div>
+    <h2 class="section-title">Year-by-year model</h2>
+
+    <div class="year-tabs">
+      <button class="year-tab active" onclick="showYear('y1',this)">Year 1 Â· ~$161K</button>
+      <button class="year-tab" onclick="showYear('y2',this)">Year 2 Â· ~$820K</button>
+      <button class="year-tab" onclick="showYear('y3',this)">Year 3 Â· ~$3.55M</button>
+    </div>
+
+    <!-- YEAR 1 -->
+    <div id="yc-y1" class="year-content active">
+      <div class="metric-grid" style="grid-template-columns:repeat(4,1fr);">
+        <div class="metric-box"><div class="metric-label">Geography</div><div class="metric-value" style="font-size:20px;">Metro Van</div></div>
+        <div class="metric-box"><div class="metric-label">Month 12 MRR</div><div class="metric-value">$25K</div></div>
+        <div class="metric-box"><div class="metric-label">Paying businesses</div><div class="metric-value">362</div></div>
+        <div class="metric-box gold"><div class="metric-label">Total Year 1</div><div class="metric-value gold">$161K</div></div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chart-y1"></canvas>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Month</th><th>Paying Businesses</th><th>Subscription Rev</th><th>Transaction Rev</th><th>Vertical Rev</th><th>MRR</th></tr></thead>
+        <tbody id="y1-table"></tbody>
+      </table>
+    </div>
+
+    <!-- YEAR 2 -->
+    <div id="yc-y2" class="year-content">
+      <div class="metric-grid" style="grid-template-columns:repeat(4,1fr);">
+        <div class="metric-box"><div class="metric-label">Geography</div><div class="metric-value" style="font-size:18px;">Van+Cal+Edm</div></div>
+        <div class="metric-box"><div class="metric-label">Month 24 MRR</div><div class="metric-value">$99.5K</div></div>
+        <div class="metric-box"><div class="metric-label">Agent seats</div><div class="metric-value">160</div></div>
+        <div class="metric-box gold"><div class="metric-label">Total Year 2</div><div class="metric-value gold">$820K</div></div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chart-y2"></canvas>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Month</th><th>Paying Businesses</th><th>Subscription Rev</th><th>Transaction Rev</th><th>Vertical Rev</th><th>MRR</th></tr></thead>
+        <tbody id="y2-table"></tbody>
+      </table>
+    </div>
+
+    <!-- YEAR 3 -->
+    <div id="yc-y3" class="year-content">
+      <div class="metric-grid" style="grid-template-columns:repeat(4,1fr);">
+        <div class="metric-box"><div class="metric-label">Geography</div><div class="metric-value" style="font-size:16px;">5 Canadian cities</div></div>
+        <div class="metric-box"><div class="metric-label">Month 36 MRR</div><div class="metric-value">$428K</div></div>
+        <div class="metric-box"><div class="metric-label">Agent seats</div><div class="metric-value">960</div></div>
+        <div class="metric-box gold"><div class="metric-label">Total Year 3</div><div class="metric-value gold">$3.55M</div></div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chart-y3"></canvas>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Month</th><th>Paying Businesses</th><th>Subscription Rev</th><th>Transaction Rev</th><th>Vertical Rev</th><th>MRR</th></tr></thead>
+        <tbody id="y3-table"></tbody>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- FUNDING -->
+    <div class="section-eyebrow">Seed Round</div>
+    <h2 class="section-title">$500,000 CAD â Use of proceeds</h2>
+
+    <div class="two-col" style="margin-bottom:24px;">
+      <div>
+        <table class="data-table">
+          <thead><tr><th>Allocation</th><th>%</th><th>Amount</th></tr></thead>
+          <tbody>
+            <tr><td class="label">BD + sales hiring</td><td class="num">40%</td><td class="num">$200,000</td></tr>
+            <tr><td class="label">Phase 2 vertical development</td><td class="num">25%</td><td class="num">$125,000</td></tr>
+            <tr><td class="label">Marketing + consumer acquisition</td><td class="num">20%</td><td class="num">$100,000</td></tr>
+            <tr><td class="label">Operations + infrastructure</td><td class="num">15%</td><td class="num">$75,000</td></tr>
+            <tr class="total"><td>Total Seed Round</td><td class="num">100%</td><td class="num">$500,000</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Raised to Date</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:var(--maroon);margin-bottom:4px;">$100,000 CAD</div>
+        <div style="font-size:13px;color:var(--ink-mid);margin-bottom:16px;">$40,000 co-founder self-funded<br>$60,000 Futurpreneur / BDC loan</div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Additional Pipeline</div>
+        <div style="font-size:13px;color:var(--ink-mid);">NVBC 2026 prize (~$110K first place)<br>NRC IRAP application in progress<br>Angel round $300Kâ$400K post-NVBC</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ASSUMPTIONS -->
+    <div class="section-eyebrow">Key Assumptions</div>
+    <h2 class="section-title">Every number has a source</h2>
+
+    <ul class="assumption-list">
+      <li><div class="a-label">D2D warm conversion: 8%</div><div class="a-val">Industry cold D2D benchmark: 2â5% (portatour.com, 2026). Warm offer (free month + business feature video) justifies 8â10%. Validated by 94% pilot interest in March 2026 survey ($16/lead).</div></li>
+      <li><div class="a-label">Monthly churn: 15% â 7% â 4%</div><div class="a-val">Year 1: conservative for new platform with no consumer volume. Year 2â3: improves as reputation lock-in compounds. SMB SaaS benchmark: 3â7% monthly (2025 industry data).</div></li>
+      <li><div class="a-label">1 brokerage every 6 weeks</div><div class="a-val">SMB SaaS sales cycle: 1â3 months median (Martal Group, 2026). Founding partner endorsement shortens cycle. 20 agents/brokerage Ã $199 = $3,980/month per brokerage.</div></li>
+      <li><div class="a-label">Transaction activation: 10% â 75%</div><div class="a-val">Builds as consumer volume grows from content engine and paid ads. Conservative in Year 1 â consumer side is thin. Normalises by Year 3 as paid ads and BILS sharing compound.</div></li>
+      <li><div class="a-label">Average job value: $200</div><div class="a-val">Conservative for Metro Vancouver home services. Landscaping, cleaning, and trades typically bill $150â$500+ per job. 4 jobs/month Ã $200 Ã 7% = $56/business/month.</div></li>
+      <li><div class="a-label">Cash-flow positive: Month 8</div><div class="a-val">At scaled burn of ~$26,293/month, breakeven requires ~235 paying solo businesses with 30% transacting. The model crosses this threshold in Month 8 of the model.</div></li>
+    </ul>
+
+    <div class="divider"></div>
+
+    <!-- RISKS -->
+    <div class="section-eyebrow">Risk Register</div>
+    <h2 class="section-title">Identified risks and mitigations</h2>
+
+    <table class="data-table">
+      <thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="label">Cold-start â businesses before consumers</td>
+          <td><span class="pill pill-med">Medium</span></td>
+          <td><span class="pill pill-med">Medium</span></td>
+          <td style="font-size:12px;">Standalone value from Day 1. BILS cross-marketing. 10-business threshold prevents wasted ad spend.</td>
+        </tr>
+        <tr>
+          <td class="label">Solo churn higher than 15%</td>
+          <td><span class="pill pill-med">Medium</span></td>
+          <td><span class="pill pill-med">Medium</span></td>
+          <td style="font-size:12px;">Free month removes low-commitment sign-ups. In-person onboarding reduces early drop-off. Reputation compounds switching cost.</td>
+        </tr>
+        <tr>
+          <td class="label">Brokerage sales cycle longer than 6 weeks</td>
+          <td><span class="pill pill-med">Medium</span></td>
+          <td><span class="pill pill-low">Low</span></td>
+          <td style="font-size:12px;">Three parallel founding partner conversations active. No single dependency.</td>
+        </tr>
+        <tr>
+          <td class="label">Student conversion below 8%</td>
+          <td><span class="pill pill-low">Low</span></td>
+          <td><span class="pill pill-med">Medium</span></td>
+          <td style="font-size:12px;">BD accompanies visits Months 1â2. Offer is genuinely attractive. 94% pilot interest confirmed.</td>
+        </tr>
+        <tr>
+          <td class="label">Seed round delayed or undersized</td>
+          <td><span class="pill pill-low">Low</span></td>
+          <td><span class="pill pill-med">Medium</span></td>
+          <td style="font-size:12px;">$1,000/month current burn. NVBC prize partially offsets. Early revenue from Month 4.</td>
+        </tr>
+        <tr>
+          <td class="label">Well-funded competitor enters</td>
+          <td><span class="pill pill-low">Low</span></td>
+          <td><span class="pill pill-high">High</span></td>
+          <td style="font-size:12px;">Multi-year rebuild for any incumbent. Transaction history, reputation data, and community content compound as moat.</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+<footer>
+  Servitium Technology Inc. Â· Metro Vancouver, BC Â· NVBC 2026 Round 2 Â· Confidential
+</footer>
+
+<script>
+// ââ PAGE NAV âââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ââ YEAR TABS âââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function showYear(id, btn) {
+  document.querySelectorAll('.year-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.year-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('yc-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ââ FINANCIAL DATA ââââââââââââââââââââââââââââââââââââââââââââââââ
+const fmt = (n) => '$' + Math.round(n).toLocaleString();
+
+// Year 1 data
+const y1Data = [
+  {mo:'M1', pay:0,   sub:0,     txn:0,    vert:0,    mrr:0},
+  {mo:'M2', pay:80,  sub:2000,  txn:336,  vert:0,    mrr:2336},
+  {mo:'M3', pay:148, sub:3700,  txn:1243, vert:0,    mrr:4943},
+  {mo:'M4', pay:190, sub:4750,  txn:1999, vert:0,    mrr:6749},
+  {mo:'M5', pay:225, sub:5625,  txn:2835, vert:0,    mrr:8460},
+  {mo:'M6', pay:255, sub:6375,  txn:3749, vert:0,    mrr:10124},
+  {mo:'M7', pay:281, sub:7025,  txn:6294, vert:0,    mrr:13319},
+  {mo:'M8', pay:303, sub:7575,  txn:7631, vert:4975, mrr:20181},
+  {mo:'M9', pay:322, sub:8050,  txn:9016, vert:4975, mrr:22041},
+  {mo:'M10',pay:338, sub:8450,  txn:9842, vert:4975, mrr:23267},
+  {mo:'M11',pay:351, sub:8775,  txn:10606,vert:4975, mrr:24356},
+  {mo:'M12',pay:362, sub:9050,  txn:11148,vert:4975, mrr:25173},
+];
+
+// Year 2 data
+const y2Data = [
+  {mo:'M13',pay:401, sub:10025, txn:12813,vert:8955,  mrr:31793},
+  {mo:'M14',pay:437, sub:10925, txn:14163,vert:12935, mrr:38023},
+  {mo:'M15',pay:502, sub:12550, txn:16867,vert:16915, mrr:46332},
+  {mo:'M16',pay:563, sub:14075, txn:19233,vert:20895, mrr:54203},
+  {mo:'M17',pay:620, sub:15500, txn:21514,vert:20895, mrr:57909},
+  {mo:'M18',pay:673, sub:16825, txn:23750,vert:24875, mrr:65450},
+  {mo:'M19',pay:722, sub:18050, txn:25869,vert:28855, mrr:72774},
+  {mo:'M20',pay:799, sub:19975, txn:29003,vert:32835, mrr:81813},
+  {mo:'M21',pay:871, sub:21775, txn:31626,vert:32835, mrr:86236},
+  {mo:'M22',pay:938, sub:23450, txn:34655,vert:32835, mrr:90940},
+  {mo:'M23',pay:1000,sub:25000, txn:37520,vert:32835, mrr:95355},
+  {mo:'M24',pay:1058,sub:26450, txn:40218,vert:32835, mrr:99503},
+];
+
+// Year 3 data
+const y3Data = [
+  {mo:'M25',pay:1176,sub:29400, txn:44698, vert:52000, mrr:126098},
+  {mo:'M26',pay:1289,sub:32225, txn:49753, vert:72000, mrr:153978},
+  {mo:'M27',pay:1557,sub:38925, txn:61087, vert:92000, mrr:192012},
+  {mo:'M28',pay:1815,sub:45375, txn:71246, vert:112000,mrr:228621},
+  {mo:'M29',pay:2062,sub:51550, txn:81953, vert:132000,mrr:265503},
+  {mo:'M30',pay:2300,sub:57500, txn:91448, vert:152000,mrr:300948},
+  {mo:'M31',pay:2528,sub:63200, txn:101677,vert:162000,mrr:326877},
+  {mo:'M32',pay:2747,sub:68675, txn:110538,vert:172000,mrr:351213},
+  {mo:'M33',pay:2957,sub:73925, txn:120397,vert:182000,mrr:376322},
+  {mo:'M34',pay:3159,sub:78975, txn:128597,vert:185000,mrr:392572},
+  {mo:'M35',pay:3353,sub:83825, txn:138778,vert:188000,mrr:410603},
+  {mo:'M36',pay:3539,sub:88475, txn:148638,vert:191040,mrr:428153},
+];
+
+function buildTable(data, tbodyId) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  tbody.innerHTML = data.map(d => `
+    <tr>
+      <td class="label">${d.mo}</td>
+      <td class="num">${d.pay}</td>
+      <td class="num">${fmt(d.sub)}</td>
+      <td class="num">${fmt(d.txn)}</td>
+      <td class="num">${d.vert > 0 ? fmt(d.vert) : 'â'}</td>
+      <td class="num" style="font-weight:600;color:var(--maroon)">${fmt(d.mrr)}</td>
+    </tr>
+  `).join('');
+}
+
+function buildChart(data, canvasId, label) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.map(d => d.mo),
+      datasets: [
+        {label:'Subscription', data: data.map(d=>d.sub), backgroundColor:'rgba(136,8,8,0.75)', stack:'s'},
+        {label:'Transaction Fees', data: data.map(d=>d.txn), backgroundColor:'rgba(201,168,76,0.8)', stack:'s'},
+        {label:'Vertical Seats', data: data.map(d=>d.vert), backgroundColor:'rgba(136,8,8,0.25)', stack:'s'},
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: {
+        legend: {labels:{font:{family:'DM Sans',size:11}, color:'#3d2f1f'}},
+        tooltip: {callbacks:{label: ctx => `${ctx.dataset.label}: $${Math.round(ctx.parsed.y).toLocaleString()}`}}
+      },
+      scales: {
+        x: {stacked:true, grid:{display:false}, ticks:{font:{family:'DM Sans',size:11}, color:'#7a6a58'}},
+        y: {stacked:true, grid:{color:'rgba(0,0,0,0.05)'}, ticks:{font:{family:'DM Sans',size:11}, color:'#7a6a58',
+          callback: v => '$' + (v>=1000 ? (v/1000).toFixed(0)+'K' : v)}}
+      }
+    }
+  });
+}
+
+// Build on load
+window.addEventListener('DOMContentLoaded', () => {
+  buildTable(y1Data, 'y1-table');
+  buildTable(y2Data, 'y2-table');
+  buildTable(y3Data, 'y3-table');
+  buildChart(y1Data, 'chart-y1', 'Year 1');
+  buildChart(y2Data, 'chart-y2', 'Year 2');
+  buildChart(y3Data, 'chart-y3', 'Year 3');
+});
+</script>
+</body>
+</html>
