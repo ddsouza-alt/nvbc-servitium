@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Servitium â Market Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --m: #880808;
+  --md: #5c0505;
+  --ml: rgba(136,8,8,0.08);
+  --g: #C9A84C;
+  --gd: #a07c2a;
+  --gp: #fdf5dc;
+  --w: #ffffff;
+  --off: #faf8f5;
+  --cream: #f2ede3;
+  --ink: #1a1008;
+  --ink2: #4a3828;
+  --ink3: #8a7060;
+  --bdr: rgba(201,168,76,0.2);
+  --bdr2: rgba(201,168,76,0.45);
+  --r: 12px;
+  --rs: 8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--ink);font-size:15px;line-height:1.6;overflow-x:hidden}
+
+/* ââ STICKY NAV âââââââââââââââââââââââââââââââââââ */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--m);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(201,168,76,0.3)}
+.topbar-brand{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:#fff;display:flex;align-items:center;gap:8px}
+.topbar-brand span{font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--g);background:rgba(201,168,76,0.12);padding:2px 7px;border-radius:3px;border:1px solid rgba(201,168,76,0.3)}
+.topbar-label{font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:.06em;text-transform:uppercase}
+
+/* ââ SECTION NAV PILLS ââââââââââââââââââââââââââââ */
+.sec-nav{position:sticky;top:52px;z-index:90;background:var(--off);border-bottom:1px solid var(--bdr);padding:10px 16px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.sec-nav::-webkit-scrollbar{display:none}
+.sec-pill{flex:0 0 auto;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--bdr2);background:transparent;color:var(--ink2);white-space:nowrap;transition:all .2s;font-family:'DM Sans',sans-serif}
+.sec-pill.active{background:var(--m);color:#fff;border-color:var(--m)}
+
+/* ââ HERO ââââââââââââââââââââââââââââââââââââââââââ */
+.hero{background:linear-gradient(160deg,var(--md) 0%,var(--m) 55%,#a01010 100%);padding:72px 20px 56px;position:relative;overflow:hidden;margin-top:52px}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--g),transparent)}
+.hero-inner{max-width:600px;margin:0 auto}
+.hero-eye{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--g);margin-bottom:12px}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,7vw,44px);font-weight:600;color:#fff;line-height:1.15;margin-bottom:14px}
+.hero-title em{color:var(--g);font-style:normal}
+.hero-sub{color:rgba(255,255,255,0.68);font-size:14px;line-height:1.7;margin-bottom:28px}
+.hero-pills{display:flex;flex-wrap:wrap;gap:8px}
+.hero-pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.07)}
+
+/* ââ SECTION WRAPPER ââââââââââââââââââââââââââââââ */
+.section{padding:40px 20px;max-width:680px;margin:0 auto}
+.section+.section{padding-top:0}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--g),transparent);margin:0 20px}
+
+/* ââ SECTION HEADERS ââââââââââââââââââââââââââââââ */
+.sec-eye{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--g);margin-bottom:6px}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--m);margin-bottom:6px}
+.sec-sub{font-size:13.5px;color:var(--ink2);line-height:1.7;margin-bottom:20px}
+
+/* ââ BIG STAT CARDS âââââââââââââââââââââââââââââââ */
+.stat-hero{background:var(--m);border-radius:var(--r);padding:24px;margin-bottom:12px;position:relative;overflow:hidden}
+.stat-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:radial-gradient(circle,rgba(201,168,76,0.15) 0%,transparent 70%);border-radius:50%}
+.stat-hero-eye{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--g);margin-bottom:6px}
+.stat-hero-val{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:700;color:#fff;line-height:1}
+.stat-hero-lbl{font-size:13px;color:rgba(255,255,255,0.65);margin-top:6px;line-height:1.5}
+
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.stat-box{background:var(--w);border:1px solid var(--bdr);border-top:3px solid var(--m);border-radius:var(--rs);padding:16px}
+.stat-box.gold{border-top-color:var(--g)}
+.stat-box-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
+.stat-box-val{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--m);line-height:1}
+.stat-box.gold .stat-box-val{color:var(--gd)}
+.stat-box-sub{font-size:11px;color:var(--ink3);margin-top:4px;line-height:1.5}
+
+/* ââ TAM/SAM/SOM FUNNEL âââââââââââââââââââââââââââ */
+.funnel{margin:20px 0}
+.funnel-item{position:relative;margin-bottom:8px;cursor:pointer}
+.funnel-bar{border-radius:var(--rs);padding:16px 18px;transition:all .2s;border:1px solid transparent}
+.funnel-bar:hover{transform:translateX(3px)}
+.funnel-item:nth-child(1) .funnel-bar{background:var(--m);margin:0}
+.funnel-item:nth-child(2) .funnel-bar{background:linear-gradient(135deg,#a01515,#c02020);margin:0 16px}
+.funnel-item:nth-child(3) .funnel-bar{background:linear-gradient(135deg,#b52020,#d03030);margin:0 32px}
+.funnel-item:nth-child(4) .funnel-bar{background:var(--g);margin:0 48px}
+.funnel-tag{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:3px}
+.funnel-item:nth-child(4) .funnel-tag{color:rgba(92,5,5,0.7)}
+.funnel-val{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:#fff;line-height:1}
+.funnel-item:nth-child(4) .funnel-val{color:var(--md)}
+.funnel-desc{font-size:12px;color:rgba(255,255,255,0.65);margin-top:3px;line-height:1.4}
+.funnel-item:nth-child(4) .funnel-desc{color:rgba(92,5,5,0.65)}
+
+.funnel-detail{display:none;background:var(--cream);border:1px solid var(--bdr);border-radius:0 0 var(--rs) var(--rs);padding:14px 16px;margin-top:-4px;font-size:13px;color:var(--ink2);line-height:1.7}
+.funnel-detail.open{display:block}
+.funnel-arrow{float:right;color:rgba(255,255,255,0.6);font-size:14px;transition:transform .2s}
+.funnel-item:nth-child(4) .funnel-arrow{color:rgba(92,5,5,0.5)}
+.funnel-item.open .funnel-arrow{transform:rotate(180deg)}
+
+/* ââ CUSTOMER CARDS âââââââââââââââââââââââââââââââ */
+.cust-tabs{display:flex;gap:8px;margin-bottom:16px}
+.cust-tab{flex:1;padding:10px;border-radius:var(--rs);text-align:center;cursor:pointer;border:1.5px solid var(--bdr);background:transparent;transition:all .2s;font-family:'DM Sans',sans-serif}
+.cust-tab.active{background:var(--m);border-color:var(--m)}
+.cust-tab-lbl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+.cust-tab.active .cust-tab-lbl{color:rgba(255,255,255,0.7)}
+.cust-tab-name{font-size:13px;font-weight:500;color:var(--ink);margin-top:2px}
+.cust-tab.active .cust-tab-name{color:#fff}
+.cust-panel{display:none}
+.cust-panel.active{display:block}
+.cust-card{background:var(--w);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden}
+.cust-card-head{background:var(--m);padding:18px 20px}
+.cust-card-head-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#fff}
+.cust-card-head-sub{font-size:12px;color:rgba(255,255,255,0.65);margin-top:3px}
+.cust-card-body{padding:18px 20px}
+.cust-pain{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--cream)}
+.cust-pain:last-child{border-bottom:none}
+.cust-pain-icon{width:36px;height:36px;border-radius:50%;background:var(--ml);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+.cust-pain-title{font-size:13px;font-weight:600;color:var(--m);margin-bottom:2px}
+.cust-pain-text{font-size:12.5px;color:var(--ink2);line-height:1.6}
+.cust-saving{background:var(--gp);border:1px solid var(--bdr2);border-radius:var(--rs);padding:14px 16px;margin-top:14px;display:flex;align-items:center;gap:12px}
+.cust-saving-val{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:var(--m);flex-shrink:0}
+.cust-saving-lbl{font-size:12.5px;color:var(--ink2);line-height:1.5}
+
+/* ââ BUYING PROCESS âââââââââââââââââââââââââââââââ */
+.process-steps{margin:16px 0}
+.process-step{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px dashed var(--bdr)}
+.process-step:last-child{border-bottom:none}
+.process-num{width:32px;height:32px;border-radius:50%;background:var(--m);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;flex-shrink:0}
+.process-title{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.process-desc{font-size:12.5px;color:var(--ink2);line-height:1.6}
+.process-tag{display:inline-block;margin-top:5px;padding:2px 8px;background:var(--ml);border-radius:10px;font-size:11px;color:var(--m);font-weight:500}
+
+/* ââ TRENDS âââââââââââââââââââââââââââââââââââââââ */
+.trend-cards{display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.trend-card{background:var(--w);border:1px solid var(--bdr);border-left:3px solid var(--g);border-radius:0 var(--rs) var(--rs) 0;padding:14px 16px}
+.trend-card-title{font-size:13.5px;font-weight:600;color:var(--m);margin-bottom:4px}
+.trend-card-val{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--g);line-height:1;margin-bottom:4px}
+.trend-card-desc{font-size:12.5px;color:var(--ink2);line-height:1.6}
+.trend-card-src{font-size:11px;color:var(--ink3);margin-top:4px}
+
+/* ââ VENDORS âââââââââââââââââââââââââââââââââââââââ */
+.vendor-grid{display:flex;flex-direction:column;gap:8px;margin:16px 0}
+.vendor-row{background:var(--w);border:1px solid var(--bdr);border-radius:var(--rs);padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.vendor-name{font-size:14px;font-weight:600;color:var(--ink)}
+.vendor-type{font-size:11px;color:var(--ink3);margin-top:1px}
+.vendor-tags{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.vtag{font-size:10px;padding:3px 8px;border-radius:10px;font-weight:500;white-space:nowrap}
+.vtag-yes{background:#e8f5e9;color:#2e7d32}
+.vtag-no{background:#fce4ec;color:#c62828}
+.vendor-gap{background:linear-gradient(135deg,var(--m),#a01515);border-color:var(--m)}
+.vendor-gap .vendor-name,.vendor-gap .vendor-type{color:#fff}
+.vendor-gap .vtag-yes{background:rgba(255,255,255,0.2);color:#fff}
+
+/* ââ BARRIERS ââââââââââââââââââââââââââââââââââââââ */
+.barrier-list{display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.barrier{background:var(--w);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;cursor:pointer}
+.barrier-head{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.barrier-icon{width:38px;height:38px;border-radius:50%;background:var(--ml);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.barrier-title{font-size:14px;font-weight:600;color:var(--ink);flex:1}
+.barrier-chevron{font-size:12px;color:var(--ink3);transition:transform .2s;flex-shrink:0}
+.barrier.open .barrier-chevron{transform:rotate(180deg)}
+.barrier-body{display:none;padding:0 16px 14px;border-top:1px solid var(--cream)}
+.barrier.open .barrier-body{display:block}
+.barrier-how{font-size:13px;color:var(--ink2);line-height:1.7;padding-top:12px}
+.barrier-how strong{color:var(--m)}
+
+/* ââ CHART WRAP âââââââââââââââââââââââââââââââââââ */
+.chart-wrap{background:var(--w);border:1px solid var(--bdr);border-radius:var(--r);padding:20px 16px;margin:16px 0}
+.chart-title{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+
+/* ââ REGULATORY âââââââââââââââââââââââââââââââââââ */
+.reg-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0}
+.reg-card{background:var(--w);border:1px solid var(--bdr);border-radius:var(--rs);padding:12px 14px}
+.reg-card-body{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g);margin-bottom:4px}
+.reg-card-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.reg-card-desc{font-size:11.5px;color:var(--ink3);line-height:1.5}
+
+/* ââ SCROLL REVEAL ââââââââââââââââââââââââââââââââ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;animation:fadeUp .5s ease forwards}
+.d1{animation-delay:.05s}.d2{animation-delay:.12s}.d3{animation-delay:.2s}.d4{animation-delay:.28s}
+
+/* ââ FOOTER âââââââââââââââââââââââââââââââââââââââ */
+footer{background:var(--md);color:rgba(255,255,255,0.4);text-align:center;padding:20px;font-size:11px;letter-spacing:.04em;border-top:1px solid rgba(201,168,76,0.15)}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">Servitium <span>Market</span></div>
+  <div class="topbar-label">NVBC 2026 Â· Q1</div>
+</div>
+
+<!-- SECTION NAV -->
+<div class="sec-nav" id="secnav">
+  <button class="sec-pill active" onclick="scrollTo('customers')">Customers</button>
+  <button class="sec-pill" onclick="scrollTo('value')">Value</button>
+  <button class="sec-pill" onclick="scrollTo('buying')">Buying Process</button>
+  <button class="sec-pill" onclick="scrollTo("market')">Market Size</button>
+  <button class="sec-pill" onclick="scrollTo('trends')">Trends</button>
+  <button class="sec-pill" onclick="scrollTo('vendors')">Vendors</button>
+  <button class="sec-pill" onclick="scrollTo('barriers')">Barriers</button>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eye reveal d1">Market Analysis Â· Question 1</div>
+    <h1 class="hero-title reveal d2">Canada's solo economy is <em>worth $300B+.</em> No platform serves it.</h1>
+    <p class="hero-sub reveal d3">4.3 million solo businesses. Fragmented tools. No integrated discovery. Servitium is the first Canadian platform to close that gap â across every industry.</p>
+    <div class="hero-pills reveal d4">
+      <span class="hero-pill">4.3M businesses nationally</span>
+      <span class="hero-pill">$300â500B combined revenue</span>
+      <span class="hero-pill">90% of all Canadian businesses</span>
+    </div>
+  </div>
+</div>
+
+<!-- ââ CUSTOMERS âââââââââââââââââââââââââââââââââââ -->
+<div id="customers" class="section">
+  <div class="sec-eye">Who is the customer</div>
+  <div class="sec-title">Two paying customers. One free side.</div>
+  <div class="sec-sub">Consumers always use Servitium for free. Revenue comes from two types of professionals â each with a distinct pain point Servitium solves.</div>
+
+  <div class="cust-tabs">
+    <div class="cust-tab active" onclick="showCust('solo',this)">
+      <div class="cust-tab-lbl">Phase 1</div>
+      <div class="cust-tab-name">Solo Businesses</div>
+    </div>
+    <div class="cust-tab" onclick="showCust('agent',this)">
+      <div class="cust-tab-lbl">Phase 2</div>
+      <div class="cust-tab-name">Professional Agents</div>
+    </div>
+    <div class="cust-tab" onclick="showCust('consumer',this)">
+      <div class="cust-tab-lbl">Free Side</div>
+      <div class="cust-tab-name">Consumers</div>
+    </div>
+  </div>
+
+  <div id="cust-solo" class="cust-panel active">
+    <div class="cust-card">
+      <div class="cust-card-head">
+        <div class="cust-card-head-title">Solo Business Owners (0â4 employees)</div>
+        <div class="cust-card-head-sub">All industries Â· Metro Vancouver â Canada</div>
+      </div>
+      <div class="cust-card-body">
+        <div class="cust-pain">
+          <div class="cust-pain-icon">ð¸</div>
+          <div><div class="cust-pain-title">Paying too much for too little</div><div class="cust-pain-text">Currently using 3â5 disconnected tools costing $100â$300/month with no integrated workflow. No consumer-facing discovery layer.</div></div>
+        </div>
+        <div class="cust-pain">
+          <div class="cust-pain-icon">ð</div>
+          <div><div class="cust-pain-title">Can't get found</div><div class="cust-pain-text">59% cite getting new clients as their #1 challenge (our March 2026 survey, n=17). No single platform helps them get discovered AND manage jobs.</div></div>
+        </div>
+        <div class="cust-pain">
+          <div class="cust-pain-icon">ð</div>
+          <div><div class="cust-pain-title">Admin kills their time</div><div class="cust-pain-text">Manual invoicing, WhatsApp bookings, cash payments. Every hour spent on admin is an hour not earning.</div></div>
+        </div>
+        <div class="cust-saving">
+          <div class="cust-saving-val">$600/mo</div>
+          <div class="cust-saving-lbl">average saving vs. current tool stack. Servitium replaces it all for $25/month + 7% on completed jobs only.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cust-agent" class="cust-panel">
+    <div class="cust-card">
+      <div class="cust-card-head">
+        <div class="cust-card-head-title">Licensed Professional Agents</div>
+        <div class="cust-card-head-sub">Real estate Â· Insurance Â· Wealth management Â· Auto</div>
+      </div>
+      <div class="cust-card-body">
+        <div class="cust-pain">
+          <div class="cust-pain-icon">ð¢</div>
+          <div><div class="cust-pain-title">Their reputation belongs to the brokerage</div><div class="cust-pain-text">When a REALTOR moves brokerages, their reviews and client history stay behind. Servitium gives them a portable identity that travels with them.</div></div>
+        </div>
+        <div class="cust-pain">
+          <div class="cust-pain-icon">ð°</div>
+          <div><div class="cust-pain-title">Wasting $800â$1,700/month on marketing tech</div><div class="cust-pain-text">Fragmented CRM, portal fees, Google Ads, and social tools â none of it connected. Metro Vancouver REALTORS spend $8,500â$20,000/year combined (BCFSA, NAR Tech Survey 2025).</div></div>
+        </div>
+        <div class="cust-pain">
+          <div class="cust-pain-icon">ð±</div>
+          <div><div class="cust-pain-title">No unified client-to-close workflow</div><div class="cust-pain-text">Insurance brokers spend 4% of revenue on technology yet only 24% offer mobile apps and 18% have client self-service portals (Smythe 2025).</div></div>
+        </div>
+        <div class="cust-saving">
+          <div class="cust-saving-val">$199/mo</div>
+          <div class="cust-saving-lbl">per agent seat. One brokerage decision by a Managing Broker instantly onboards their entire team â replacing fragmented individual tool spend.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cust-consumer" class="cust-panel">
+    <div class="cust-card">
+      <div class="cust-card-head">
+        <div class="cust-card-head-title">Consumers</div>
+        <div class="cust-card-head-sub">Always free Â· The demand side of the platform</div>
+      </div>
+      <div class="cust-card-body">
+        <div class="cust-pain">
+          <div class="cust-pain-icon">ð</div>
+          <div><div class="cust-pain-title">Can't trust reviews</div><div class="cust-pain-text">Reviews on existing platforms can be posted without a completed job. On Servitium, reviews only post after mutual job confirmation and payment â structurally impossible to fake.</div></div>
+        </div>
+        <div class="cust-pain">
+          <div class="cust-pain-icon">ð³</div>
+          <div><div class="cust-pain-title">Payment disputes and cash anxiety</div><div class="cust-pain-text">Payment releases only upon mutual job confirmation. No more chasing invoices or paying before work is done.</div></div>
+        </div>
+        <div class="cust-pain">
+          <div class="cust-pain-icon">ðï¸</div>
+          <div><div class="cust-pain-title">Can't find trusted local professionals</div><div class="cust-pain-text">30% of Canadians don't trust businesses without a verified online presence (CIRA 2024). Servitium gives every local professional a verified, shareable profile.</div></div>
+        </div>
+        <div class="cust-saving">
+          <div class="cust-saving-val">$0</div>
+          <div class="cust-saving-lbl">Consumers pay nothing. Discovery, booking, payment, and verified reviews â all free, always.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ââ VALUE PROPOSITION ââââââââââââââââââââââââââââ -->
+<div id="value" class="section">
+  <div class="sec-eye">Value Proposition</div>
+  <div class="sec-title">Quantifiable value. Immediately.</div>
+  <div class="sec-sub">The platform pays for itself with a single completed job.</div>
+
+  <div class="stat-grid">
+    <div class="stat-box"><div class="stat-box-lbl">Solo business saves</div><div class="stat-box-val">$600</div><div class="stat-box-sub">per month vs. current tool stack</div></div>
+    <div class="stat-box"><div class="stat-box-lbl">Agent saves</div><div class="stat-box-val">$800+</div><div class="stat-box-sub">per month vs. fragmented tools</div></div>
+    <div class="stat-box gold"><div class="stat-box-lbl">Solo price</div><div class="stat-box-val">$25</div><div class="stat-box-sub">per month + 7% on completed jobs only</div></div>
+    <div class="stat-box gold"><div class="stat-box-lbl">Agent seat</div><div class="stat-box-val">$199</div><div class="stat-box-sub">per month Â· pure subscription</div></div>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="chart-title">What solo businesses currently spend vs. Servitium</div>
+    <canvas id="costChart" height="180"></canvas>
+  </div>
+
+  <div class="trend-cards">
+    <div class="trend-card">
+      <div class="trend-card-title">Survey validation Â· March 2026</div>
+      <div class="trend-card-val">94%</div>
+      <div class="trend-card-desc">of surveyed business owners expressed interest in joining a pilot. 65% rated a unified platform as "valuable" or a "total game-changer." 71% confirmed willingness to pay $25+/month.</div>
+      <div class="trend-card-src">$201 Meta ad spend Â· 17 survey responses Â· 13 qualified leads Â· $16 cost-per-lead</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ââ BUYING PROCESS âââââââââââââââââââââââââââââââ -->
+<div id="buying" class="section">
+  <div class="sec-eye">Buying Process</div>
+  <div class="sec-title">From first contact to paying customer.</div>
+  <div class="sec-sub">No approval chain. No learning curve. No upfront risk. The first completed job proves the value.</div>
+
+  <div class="process-steps">
+    <div class="process-step">
+      <div class="process-num">1</div>
+      <div><div class="process-title">Personal outreach</div><div class="process-desc">Student brand ambassador visits the business in person. BD hire accompanies early visits. Warm offer â not cold selling.</div><span class="process-tag">In-person Â· no cold calls</span></div>
+    </div>
+    <div class="process-step">
+      <div class="process-num">2</div>
+      <div><div class="process-title">Free founding partner month</div><div class="process-desc">First month is completely free. Business gets onboarded, a BILS card for sharing, and a professional video about their business posted to social media.</div><span class="process-tag">Zero risk Â· immediate value</span></div>
+    </div>
+    <div class="process-step">
+      <div class="process-num">3</div>
+      <div><div class="process-title">First completed job</div><div class="process-desc">The first job through the platform demonstrates immediate value â reduced admin, verified payment, and a new review on their profile.</div><span class="process-tag">Value proven in Week 1</span></div>
+    </div>
+    <div class="process-step">
+      <div class="process-num">4</div>
+      <div><div class="process-title">Paying subscriber</div><div class="process-desc">Month 2 subscription activates at $25/month. Retention driven by reputation lock-in â reviews and work history compound on their profile.</div><span class="process-tag">$25/month Â· no contract</span></div>
+    </div>
+  </div>
+
+  <div class="stat-hero">
+    <div class="stat-hero-eye">Vertical offices â even simpler</div>
+    <div class="stat-hero-val">1 Decision</div>
+    <div class="stat-hero-lbl">One Managing Broker or General Manager signs on â their entire team is onboarded instantly. No individual sales cycle per agent.</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ââ MARKET SIZE âââââââââââââââââââââââââââââââââââ -->
+<div id="market" class="section">
+  <div class="sec-eye">Target Market Size</div>
+  <div class="sec-title">TAM Â· SAM Â· SOM</div>
+  <div class="sec-sub">Tap each tier to see what's included. Conservative estimates only â sources linked in application.</div>
+
+  <div class="funnel">
+    <div class="funnel-item" onclick="toggleFunnel(this)">
+      <div class="funnel-bar"><span class="funnel-arrow">â¼</span><div class="funnel-tag">TAM Â· Canada</div><div class="funnel-val">~4.55M+</div><div class="funnel-desc">All segments nationally</div></div>
+      <div class="funnel-detail">4.3M solo/micro businesses (0â4 employees) generating $300â500B/year in combined revenue + ~250,000 licensed vertical professionals (REALTORS, insurance brokers, wealth advisors, auto salespersons) across Canada. <strong>90% of all active Canadian businesses</strong> fall in this category. Source: ISED KSBS 2025, StatCan Dec 2025, CREA, CIRO, IBABC.</div>
+    </div>
+    <div class="funnel-item" onclick="toggleFunnel(this)">
+      <div class="funnel-bar"><span class="funnel-arrow">â¼</span><div class="funnel-tag">SAM Â· British Columbia</div><div class="funnel-val">615â665K+</div><div class="funnel-desc">All segments in BC</div></div>
+      <div class="funnel-detail">580â620K solo businesses + ~29,400 REALTORS (BCFSA) + 8,400+ insurance brokers/employees (IBABC) + ~4,000 CIRO advisors + ~5,000 auto salespersons in BC. <strong>BC has the highest business density in Canada</strong> at 36.3 per 1,000 adults. Source: BCFSA, IBABC, CIRO, StatCan.</div>
+    </div>
+    <div class="funnel-item" onclick="toggleFunnel(this)">
+      <div class="funnel-bar"><span class="funnel-arrow">â¼</span><div class="funnel-tag">SAM Â· Metro Vancouver</div><div class="funnel-val">107â150K+</div><div class="funnel-desc">Launch market</div></div>
+      <div class="funnel-detail">80â120K solo businesses + ~15,000 REALTORS (GVR members) + ~4,200 insurance brokers (IBABC Metro Van est.) + 3,000â5,000 CIRO wealth advisors + ~3,500 auto salespersons. <strong>Combined marketing + tech spend: ~$2B+/year CAD</strong>, currently fragmented across disconnected tools. Source: GVR, IBABC, CIRO, VSA.</div>
+    </div>
+    <div class="funnel-item" onclick="toggleFunnel(this)">
+      <div class="funnel-bar"><span class="funnel-arrow">â¼</span><div class="funnel-tag">SOM Â· Year 1 Target</div><div class="funnel-val">390â670</div><div class="funnel-desc">Metro Vancouver Â· less than 1% of SAM</div></div>
+      <div class="funnel-detail">300â520 solo business accounts at $25/month + 90â150 vertical agent seats at $199/month. Conservative scenario: $44K MRR by Month 6. Realistic scenario: $82K MRR by Month 6. <strong>Less than 1% of the local SAM</strong> â deliberately conservative. Source: bottom-up model based on student team capacity and D2D conversion benchmarks.</div>
+    </div>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="chart-title">Metro Vancouver â market composition</div>
+    <canvas id="marketChart" height="220"></canvas>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ââ TRENDS âââââââââââââââââââââââââââââââââââââââ -->
+<div id="trends" class="section">
+  <div class="sec-eye">Market Trends</div>
+  <div class="sec-title">The market is accelerating toward Servitium.</div>
+  <div class="sec-sub">Three structural forces converging â each one amplifying the opportunity.</div>
+
+  <div class="trend-cards">
+    <div class="trend-card">
+      <div class="trend-card-title">Self-employment is surging</div>
+      <div class="trend-card-val">+70,000</div>
+      <div class="trend-card-desc">New solo Canadians joined the workforce in 2024 alone (BDC, Feb 2026), bringing the total to ~2 million solo self-employed. Micro-business birth rate: 11.7% vs. 3.3% for larger firms â the fastest-growing size category.</div>
+      <div class="trend-card-src">Source: BDC Self-Employment Rebound Study, Feb 2026 Â· ISED KSBS 2025</div>
+    </div>
+    <div class="trend-card">
+      <div class="trend-card-title">Digital payments are now the norm</div>
+      <div class="trend-card-val">86%</div>
+      <div class="trend-card-desc">of all Canadian payment volume is now digital â across 22.5 billion transactions in 2024 (Payments Canada, 2025). The infrastructure for mobile-first job completion is already in place.</div>
+      <div class="trend-card-src">Source: Payments Canada Annual Report 2025</div>
+    </div>
+    <div class="trend-card">
+      <div class="trend-card-title">Solo businesses are massively under-digitized</div>
+      <div class="trend-card-val">10%</div>
+      <div class="trend-card-desc">Only 10% of Canadian micro-businesses are fully digitalized across all core operations. 48% cite high cost as the primary barrier to software adoption. Two-thirds use two or fewer paid software tools.</div>
+      <div class="trend-card-src">Source: CFIB Digital Transformation Survey, AprâJun 2025, n=1,683</div>
+    </div>
+    <div class="trend-card">
+      <div class="trend-card-title">Home services platform market growing fast</div>
+      <div class="trend-card-val">14.8%</div>
+      <div class="trend-card-desc">CAGR projected for Canadian on-demand home services platforms through 2030 (Grand View Research). Yet digital platform-intermediated transactions represent just 0.3â0.4% of the $105B renovation market â the gap is enormous.</div>
+      <div class="trend-card-src">Source: Grand View Research 2023â2030 Â· CHBA Building Excellence, Jan 2025</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ââ LARGE VENDORS âââââââââââââââââââââââââââââââââ -->
+<div id="vendors" class="section">
+  <div class="sec-eye">Large Vendors</div>
+  <div class="sec-title">The competition. And the gap they leave.</div>
+  <div class="sec-sub">Every dominant platform sits in only one quadrant â either lead generation or business management, never both. Servitium occupies the empty quadrant.</div>
+
+  <div class="vendor-grid">
+    <div class="vendor-row vendor-gap">
+      <div>
+        <div class="vendor-name">â Servitium</div>
+        <div class="vendor-type">The integrated quadrant â currently unoccupied in Canada</div>
+      </div>
+      <div class="vendor-tags">
+        <span class="vtag vtag-yes">Discovery â</span>
+        <span class="vtag vtag-yes">Ops tools â</span>
+        <span class="vtag vtag-yes">CAD â</span>
+      </div>
+    </div>
+    <div class="vendor-row">
+      <div>
+        <div class="vendor-name">HomeStars</div>
+        <div class="vendor-type">Canada's largest home services marketplace Â· ~$12â17M USD revenue</div>
+      </div>
+      <div class="vendor-tags">
+        <span class="vtag vtag-yes">Discovery â</span>
+        <span class="vtag vtag-no">No ops tools</span>
+        <span class="vtag vtag-no">$299+/mo</span>
+      </div>
+    </div>
+    <div class="vendor-row">
+      <div>
+        <div class="vendor-name">Jobber</div>
+        <div class="vendor-type">Canadian-built field service management Â· $175M+ revenue</div>
+      </div>
+      <div class="vendor-tags">
+        <span class="vtag vtag-no">No discovery</span>
+        <span class="vtag vtag-yes">Ops tools â</span>
+        <span class="vtag vtag-no">USD only</span>
+      </div>
+    </div>
+    <div class="vendor-row">
+      <div>
+        <div class="vendor-name">Jiffy</div>
+        <div class="vendor-type">Acquired by Intact Financial 2024 Â· home services only</div>
+      </div>
+      <div class="vendor-tags">
+        <span class="vtag vtag-yes">Discovery â</span>
+        <span class="vtag vtag-no">20â30% take rate</span>
+        <span class="vtag vtag-no">Home only</span>
+      </div>
+    </div>
+    <div class="vendor-row">
+      <div>
+        <div class="vendor-name">Bark.com / TaskRabbit</div>
+        <div class="vendor-type">Lead gen marketplaces Â· limited Canadian presence</div>
+      </div>
+      <div class="vendor-tags">
+        <span class="vtag vtag-yes">Discovery â</span>
+        <span class="vtag vtag-no">Pay-per-lead</span>
+        <span class="vtag vtag-no">USD</span>
+      </div>
+    </div>
+    <div class="vendor-row">
+      <div>
+        <div class="vendor-name">BCAA Marketplace</div>
+        <div class="vendor-type">BC-specific Â· 1M+ BCAA member base Â· directory model</div>
+      </div>
+      <div class="vendor-tags">
+        <span class="vtag vtag-yes">BC consumer base</span>
+        <span class="vtag vtag-no">Directory only</span>
+        <span class="vtag vtag-no">No workflow</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ââ BARRIERS âââââââââââââââââââââââââââââââââââââ -->
+<div id="barriers" class="section">
+  <div class="sec-eye">Barriers to Market Entry</div>
+  <div class="sec-title">The challenges â and how Servitium overcomes them.</div>
+  <div class="sec-sub">Tap each barrier to see the mitigation strategy.</div>
+
+  <div class="barrier-list">
+    <div class="barrier" onclick="toggleBarrier(this)">
+      <div class="barrier-head">
+        <div class="barrier-icon">ð</div>
+        <div class="barrier-title">Cold-start / chicken-and-egg problem</div>
+        <span class="barrier-chevron">â¼</span>
+      </div>
+      <div class="barrier-body"><div class="barrier-how">Businesses won't join without consumers â consumers won't come without businesses. <strong>Servitium's fix:</strong> Platform delivers standalone operational value from Day 1. Businesses manage quotes, jobs, payments, and reputation without needing any consumer volume. The BILS card gives them an immediate marketing asset. Consumer marketing only activates once 10 businesses are onboarded per category.</div></div>
+    </div>
+    <div class="barrier" onclick="toggleBarrier(this)">
+      <div class="barrier-head">
+        <div class="barrier-icon">ð°</div>
+        <div class="barrier-title">Cost barrier (48% cite cost â CFIB 2025)</div>
+        <span class="barrier-chevron">â¼</span>
+      </div>
+      <div class="barrier-body"><div class="barrier-how"><strong>$25/month with first month free.</strong> No contract. No minimum commitment. The platform pays for itself with a single completed job â a $2,000 job generates a $140 platform fee, covering 5+ months of subscription. Lowest price point of any comparable Canadian platform.</div></div>
+    </div>
+    <div class="barrier" onclick="toggleBarrier(this)">
+      <div class="barrier-head">
+        <div class="barrier-icon">ð±</div>
+        <div class="barrier-title">Digital skills barrier (51% cite lack of skills)</div>
+        <span class="barrier-chevron">â¼</span>
+      </div>
+      <div class="barrier-body"><div class="barrier-how"><strong>The student field team removes this barrier entirely.</strong> Students visit businesses in person, walk owners through the app on-site, and film their first piece of content for them. No tutorial video, no help desk. A human being onboards them face-to-face. UX mirrors the social media apps they already use daily.</div></div>
+    </div>
+    <div class="barrier" onclick="toggleBarrier(this)">
+      <div class="barrier-head">
+        <div class="barrier-icon">ð</div>
+        <div class="barrier-title">Canadian regulatory complexity</div>
+        <span class="barrier-chevron">â¼</span>
+      </div>
+      <div class="barrier-body"><div class="barrier-how">Canada's multi-province tax system (GST/HST/PST), PIPEDA data privacy requirements, Interac payment rails, and bilingual requirements deter US-first platforms. <strong>Servitium is Canadian-first</strong> â CAD pricing, Stripe-compatible, PIPEDA-aligned, and province-aware. BCFSA, Insurance Council of BC, CIRO, and VSA govern professional verticals; »ervitium is a business tool, not a licensed intermediary.</div></div>
+    </div>
+    <div class="barrier" onclick="toggleBarrier(this)">
+      <div class="barrier-head">
+        <div class="barrier-icon">ð¢</div>
+        <div class="barrier-title">Sales capacity gap</div>
+        <span class="barrier-chevron">â¼</span>
+      </div>
+      <div class="barrier-body"><div class="barrier-how">Reaching solo businesses at scale and converting vertical office partnerships simultaneously requires dedicated BD resources the founding team doesn't yet have. <strong>This is the identified priority hire</strong> â one senior BD hire funded through the seed round and competition prizes. The student micro-influencer team handles volume acquisition; the BD hire closes brokerage deals.</div></div>
+    </div>
+    <div class="barrier" onclick="toggleBarrier(this)">
+      <div class="barrier-head">
+        <div class="barrier-icon">âï¸</div>
+        <div class="barrier-title">Well-funded competitor enters</div>
+        <span class="barrier-chevron">â¼</span>
+      </div>
+      <div class="barrier-body"><div class="barrier-how">The most significant structural threat. <strong>Why it's unlikely to succeed:</strong> Lead-gen platforms can't build workflow tools without destroying their revenue model. SaaS tools can't build consumer marketplaces without alienating their B2B customer base. Servitium's compounding transaction history and verified review data create a moat that takes years of real-world operation to replicate. The Jiffy/Intact acquisition (2024) is the clearest signal that institutional capital already tried â and chose a home-services-only path.</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- REGULATORY -->
+<div class="section">
+  <div class="sec-eye">Regulatory Environment</div>
+  <div class="sec-title">Compliance awareness built in.</div>
+  <div class="sec-sub">Servitium is a business tool, not a licensed intermediary â limiting direct regulatory exposure across all verticals.</div>
+
+  <div class="reg-grid">
+    <div class="reg-card"><div class="reg-card-body">Real Estate</div><div class="reg-card-name">BCFSA</div><div class="reg-card-desc">BC Financial Services Authority Â· 29,400 licensed agents in BC</div></div>
+    <div class="reg-card"><div class="reg-card-body">Insurance</div><div class="reg-card-name">Insurance Council BC</div><div class="reg-card-desc">8,400+ licensed brokers/employees Â· 870+ brokerages</div></div>
+    <div class="reg-card"><div class="reg-card-body">Wealth</div><div class="reg-card-name">CIRO</div><div class="reg-card-desc">Canadian Investment Regulatory Organization Â· 3,000â5,000 advisors Metro Van</div></div>
+    <div class="reg-card"><div class="reg-card-body">Auto</div><div class="reg-card-name">VSA</div><div class="reg-card-desc">Vehicle Sales Authority of BC Â· 700â850 dealerships Metro Van</div></div>
+    <div class="reg-card"><div class="reg-card-body">Data Privacy</div><div class="reg-card-name">PIPEDA</div><div class="reg-card-desc">Personal Information Protection and Electronic Documents Act Â· Canadian-first architecture</div></div>
+    <div class="reg-card"><div class="reg-card-body">Payments</div><div class="reg-card-name">Stripe + Interac</div><div class="reg-card-desc">CAD-native payment processing Â· CDIC-compliant float accounts</div></div>
+  </div>
+</div>
+
+<footer>Servitium Technology Inc. Â· Metro Vancouver, BC Â· NVBC 2026 Round 2 Â· Confidential</footer>
+
+<script>
+// ââ SECTION NAV ACTIVE ââââââââââââââââââââââââââââ
+const sections=['customers','value','buying','market','trends',"vendors','barriers'];
+function scrollTo(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const y=el.getBoundingClientRect().top+window.scrollY-110;
+  window.scrollTo({top:y,behavior:'smooth'});
+}
+window.addEventListener('scroll',()=>{
+  const pills=document.querySelectorAll('.sec-pill');
+  let cur='';
+  sections.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&el.getBoundingClientRect().top<=130)cur=id;
+  });
+  pills.forEach((p,i)=>{
+    p.classList.toggle('active',sections[i]===cur);
+  });
+},{passive:true});
+
+// ââ CUSTOMER TABS âââââââââââââââââââââââââââââââââ
+function showCust(id,btn){
+  document.querySelectorAll('.cust-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.cust-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('cust-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ââ FUNNEL TOGGLES ââââââââââââââââââââââââââââââââ
+function toggleFunnel(item){
+  const detail=item.querySelector('.funnel-detail');
+  const isOpen=detail.classList.contains('open');
+  document.querySelectorAll('.funnel-detail').forEach(d=>d.classList.remove('open'));
+  document.querySelectorAll('.funnel-item').forEach(i=>i.classList.remove('open'));
+  if(!isOpen){detail.classList.add('open');item.classList.add('open');}
+}
+
+// ââ BARRIER TOGGLES âââââââââââââââââââââââââââââââ
+function toggleBarrier(el){
+  const isOpen=el.classList.contains('open');
+  document.querySelectorAll('.barrier').forEach(b=>b.classList.remove('open'));
+  if(!isOpen)el.classList.add('open');
+}
+
+// ââ COST CHART ââââââââââââââââââââââââââââââââââââ
+const costCtx=document.getElementById('costChart');
+new Chart(costCtx,{type:'bar',
+  data:{
+    labels:['Website\nhosting','Booking\ntools','Accounting','Scheduling','CRM','Servitium\n(replaces all)'],
+    datasets:[{
+      label:'Monthly Cost (CAD)',
+      data:[50,80,45,60,75,25],
+      backgroundColor:['rgba(136,8,8,0.25)','rgba(136,8,8,0.25)','rgba(136,8,8,0.25)','rgba(136,8,8,0.25)','rgba(136,8,8,0.25)','rgba(201,168,76,0.85)'],
+      borderColor:['rgba(136,8,8,0.5)','rgba(136,8,8,0.5)','rgba(136,8,8,0.5)','rgba(136,8,8,0.5)','rgba(136,8,8,0.5)','rgba(201,168,76,1)'],
+      borderWidth:1,borderRadius:4
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:true,
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:c=>'$'+c.parsed.y+'/month'}}
+    },
+    scales:{
+      x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:10},color:'#8a7060',maxRotation:0}},
+      y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'DM Sans',size:10},color:'#8a7060',callback:v=>'$'+v}}
+    }
+  }
+});
+
+// ââ MARKET DONUT CHART ââââââââââââââââââââââââââââ
+const mktCtx=document.getElementById('marketChart');
+new Chart(mktCtx,{type:'doughnut',
+  data:{
+    labels:['Solo businesses (80â120K)','REALTORS (~15,000)','Insurance brokers (~4,200)','Wealth advisors (3â5K)','Auto salespersons (~3,500)'],
+    datasets:[{
+      data:[100000,15000,4200,4000,3500],
+      backgroundColor:['rgba(136,8,8,0.85)','rgba(201,168,76,0.85)','rgba(136,8,8,0.5)','rgba(201,168,76,0.5)','rgba(136,8,8,0.3)'],
+      borderWidth:2,borderColor:'#faf8f5',hoverOffset:8
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:true,
+    plugins:{
+      legend:{position:'bottom',labels:{font:{family:'DM Sans',size:11},color:'#4a3828',padding:10,boxWidth:12}},
+      tooltip:{callbacks:{label:c=>' '+c.label+': ~'+c.parsed.toLocaleString()}}
+    },
+    cutout:'60%'
+  }
+});
+</script>
+</body>
+</html>
