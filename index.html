@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Servitium â NVBC Submission</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --m: #880808;
+    --md: #5c0505;
+    --g: #C9A84C;
+    --gd: #a07c2a;
+    --gp: #fdf5dc;
+    --off: #faf8f5;
+    --cream: #f2ede3;
+    --ink: #1a1008;
+    --ink2: #4a3828;
+    --ink3: #8a7060;
+    --bdr: rgba(201,168,76,0.2);
+    --bdr2: rgba(201,168,76,0.45);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--off);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: var(--m);
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; height: 56px;
+  }
+  .nav-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; font-weight: 600; color: #fff;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-badge {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--g); background: rgba(201,168,76,0.12);
+    padding: 3px 8px; border-radius: 3px;
+    border: 1px solid rgba(201,168,76,0.3);
+  }
+  .nav-right {
+    font-size: 11px; color: rgba(255,255,255,0.5);
+    letter-spacing: .06em; text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(160deg, var(--md) 0%, var(--m) 55%, #a01010 100%);
+    padding: 110px 24px 72px;
+    position: relative; overflow: hidden;
+    text-align: center;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 120%, rgba(201,168,76,0.12) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--g), transparent);
+  }
+  .hero-eyebrow {
+    font-size: 10px; font-weight: 600; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--g); margin-bottom: 16px;
+    font-family: 'DM Mono', monospace;
+  }
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 8vw, 60px); font-weight: 700;
+    color: #fff; line-height: 1.1; margin-bottom: 16px;
+  }
+  .hero-title em { color: var(--g); font-style: normal; }
+  .hero-sub {
+    color: rgba(255,255,255,0.65); font-size: 15px;
+    line-height: 1.7; max-width: 480px; margin: 0 auto 32px;
+  }
+  .hero-divider {
+    width: 48px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--g), transparent);
+    margin: 0 auto 32px;
+  }
+
+  /* SECTION LABEL */
+  .section-wrap {
+    max-width: 900px; margin: 0 auto;
+    padding: 64px 24px 80px;
+  }
+  .section-label {
+    font-size: 10px; font-weight: 600; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--g);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px; font-weight: 600; color: var(--m);
+    margin-bottom: 6px;
+  }
+  .section-sub {
+    font-size: 13.5px; color: var(--ink2); margin-bottom: 40px; line-height: 1.7;
+  }
+
+  /* CARDS GRID */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid var(--bdr);
+    border-radius: 14px;
+    overflow: hidden;
+    text-decoration: none;
+    display: flex; flex-direction: column;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    position: relative;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(136,8,8,0.1), 0 4px 12px rgba(0,0,0,0.06);
+    border-color: var(--bdr2);
+  }
+  .card-header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--bdr);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .card-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--m), var(--md));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .card-icon.dark {
+    background: linear-gradient(135deg, #1c1c1e, #111);
+  }
+  .card-meta { flex: 1; min-width: 0; }
+  .card-tag {
+    font-size: 9px; font-weight: 600; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--g);
+    font-family: 'DM Mono', monospace; margin-bottom: 4px;
+  }
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px; font-weight: 600; color: var(--ink);
+    line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .card-body { padding: 16px 20px 20px; flex: 1; }
+  .card-desc {
+    font-size: 13px; color: var(--ink2); line-height: 1.65;
+    margin-bottom: 16px;
+  }
+  .card-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 10.5px; font-weight: 500;
+    background: var(--cream); color: var(--ink2);
+    border: 1px solid var(--bdr); white-space: nowrap;
+  }
+  .card-footer {
+    padding: 12px 20px;
+    background: var(--cream);
+    border-top: 1px solid var(--bdr);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-url {
+    font-size: 11px; color: var(--ink3);
+    font-family: 'DM Mono', monospace;
+  }
+  .card-arrow {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--m); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+    transition: transform .2s;
+  }
+  .card:hover .card-arrow { transform: translateX(3px); }
+
+  /* FOOTER */
+  footer {
+    background: var(--md);
+    border-top: 1px solid rgba(201,168,76,0.2);
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .footer-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; font-weight: 600; color: #fff;
+    margin-bottom: 8px;
+  }
+  .footer-sub {
+    font-size: 12px; color: rgba(255,255,255,0.4);
+    letter-spacing: .08em; font-family: 'DM Mono', monospace;
+  }
+  .footer-line {
+    width: 60px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--g), transparent);
+    margin: 16px auto;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    Servitium <span class="nav-badge">NVBC 2025</span>
+  </div>
+  <div class="nav-right">Submission Hub</div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">New Venture Business Competition</div>
+  <h1 class="hero-title">Servitium<br><em>Submission Hub</em></h1>
+  <p class="hero-sub">All research, analysis, and financial models compiled for the NVBC submission. Select a section below to explore.</p>
+  <div class="hero-divider"></div>
+</div>
+
+<!-- CARDS -->
+<div class="section-wrap">
+  <div class="section-label">Explore Sections</div>
+  <h2 class="section-title">NVBC Supporting Documents</h2>
+  <p class="section-sub">Five detailed pages covering every aspect of Servitium's business case.</p>
+
+  <div class="cards">
+
+    <!-- Market Research -->
+    <a class="card" href="/research">
+      <div class="card-header">
+        <div class="card-icon">ð</div>
+        <div class="card-meta">
+          <div class="card-tag">Page 1 Â· Research</div>
+          <div class="card-title">Market Research</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Primary and secondary research underpinning Servitium's market opportunity, customer segments, and demand validation.</p>
+        <div class="card-chips">
+          <span class="chip">Customer Insights</span>
+          <span class="chip">Data Sources</span>
+          <span class="chip">Demand Sizing</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-url">/research</span>
+        <div class="card-arrow">â</div>
+      </div>
+    </a>
+
+    <!-- Market Analysis -->
+    <a class="card" href="/market-analysis">
+      <div class="card-header">
+        <div class="card-icon">ð</div>
+        <div class="card-meta">
+          <div class="card-tag">Page 2 Â· Analysis</div>
+          <div class="card-title">Market Analysis</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">TAM, SAM & SOM breakdown, market growth trends, and the macro forces shaping Servitium's addressable landscape.</p>
+        <div class="card-chips">
+          <span class="chip">TAM / SAM / SOM</span>
+          <span class="chip">Growth Trends</span>
+          <span class="chip">Segmentation</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-url">/market-analysis</span>
+        <div class="card-arrow">â</div>
+      </div>
+    </a>
+
+    <!-- Distribution / Investor Overview -->
+    <a class="card" href="/distribution">
+      <div class="card-header">
+        <div class="card-icon">ð¦</div>
+        <div class="card-meta">
+          <div class="card-tag">Page 3 Â· Overview</div>
+          <div class="card-title">Investor Overview</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Investor and judge-facing summary of Servitium's distribution model, go-to-market strategy, and business fundamentals.</p>
+        <div class="card-chips">
+          <span class="chip">Go-to-Market</span>
+          <span class="chip">Distribution</span>
+          <span class="chip">Value Prop</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-url">/distribution</span>
+        <div class="card-arrow">â</div>
+      </div>
+    </a>
+
+    <!-- SWOT / Competitive Analysis -->
+    <a class="card" href="/swot">
+      <div class="card-header">
+        <div class="card-icon">âï¸</div>
+        <div class="card-meta">
+          <div class="card-tag">Page 4 Â· Competitive</div>
+          <div class="card-title">Competitive Analysis</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">SWOT analysis and competitive landscape mapping â where Servitium stands relative to incumbent and emerging alternatives.</p>
+        <div class="card-chips">
+          <span class="chip">SWOT</span>
+          <span class="chip">Competitor Map</span>
+          <span class="chip">Differentiation</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-url">/swot</span>
+        <div class="card-arrow">â</div>
+      </div>
+    </a>
+
+    <!-- Financial Model -->
+    <a class="card" href="/financial-model">
+      <div class="card-header">
+        <div class="card-icon dark">ð°</div>
+        <div class="card-meta">
+          <div class="card-tag">Page 5 Â· Financials</div>
+          <div class="card-title">Financial Model</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Interactive 3-year financial projections covering revenue streams, unit economics, burn rate, and path to profitability.</p>
+        <div class="card-chips">
+          <span class="chip">Revenue Model</span>
+          <span class="chip">Unit Economics</span>
+          <span class="chip">Projections</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-url">/financial-model</span>
+        <div class="card-arrow">â</div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">Servitium</div>
+  <div class="footer-line"></div>
+  <div class="footer-sub">NVBC 2025 Â· Confidential Submission Material</div>
+</footer>
+
+</body>
+</html>
