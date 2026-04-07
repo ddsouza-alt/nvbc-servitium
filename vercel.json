@@ -1,0 +1,11 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/research", "destination": "/research/index.html" },
+    { "source": "/market-analysis", "destination": "/market-analysis/index.html" },
+    { "source": "/distribution", "destination": "/distribution/index.html" },
+    { "source": "/swot", "destination": "/swot/index.html" },
+    { "source": "/financial-model", "destination": "/financial-model/index.html" }
+  ]
+}
